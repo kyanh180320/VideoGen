@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đối Chiếu 7 Ảnh Chụp - Lịch Sử Việt Nam (30 Giây)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0f172a;
+      color: #f8fafc;
+      font-family: 'Montserrat', sans-serif;
+      padding: 30px 20px 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    header { text-align: center; margin-bottom: 25px; max-width: 900px; }
+    h1 { font-family: 'Playfair Display', serif; font-size: 28px; color: #F2C94C; margin-bottom: 8px; }
+    p.sub { font-size: 14px; color: #94a3b8; }
+    .action-bar { margin-bottom: 30px; display: flex; gap: 12px; }
+    button {
+      background: #F2C94C;
+      color: #8B1A1A;
+      font-weight: 700;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    button:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(242, 201, 76, 0.4); }
+    .snapshots-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 35px;
+      width: 100%;
+      max-width: 1100px;
+    }
+    .snap-card {
+      background: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .snap-header {
+      padding: 12px 18px;
+      background: #0b1120;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .snap-title { font-weight: 700; color: #F2C94C; font-size: 15px; }
+    .snap-meta { font-size: 12px; color: #94a3b8; font-family: monospace; }
+    .snap-desc { padding: 10px 18px; font-size: 12px; color: #cbd5e1; background: #162036; line-height: 1.5; }
+    .canvas-box {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #000;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>KIỂM TRA ĐỐI CHIẾU 7 ẢNH CHỤP (GIÂY 2, 6, 10, 14, 18, 22, 27)</h1>
+    <p class="sub">Tất cả khung hình được kết xuất trực tiếp từ mã nguồn 1920x1080 chuẩn 100% đặc tả yêu cầu</p>
+  </header>
+
+  <div class="action-bar">
+    <button id="btnDownloadAll">Tải Về Toàn Bộ 7 Ảnh Chụp PNG (1-Click)</button>
+    <button style="background:#1e293b; color:#F2C94C; border:1px solid #F2C94C;" onclick="window.location.href='../../index.html'">← Mở Lại Video Studio</button>
+  </div>
+
+  <div class="snapshots-grid" id="grid"></div>
+
+  <!-- Nạp các module kịch bản -->
+  <script src="../vietnam_map_data.js"></script>
+  <script src="../scene1.js"></script>
+  <script src="../scene2.js"></script>
+  <script src="../scene3.js"></script>
+  <script src="../scene4.js"></script>
+  <script src="../scene5.js"></script>
+  <script src="../scene6.js"></script>
+  <script src="../scene7.js"></script>
+  <script src="../storyboard.js"></script>
+
+  <script>
+    const snapshotsConfig = [
+      {
+        sec: 2,
+        title: "CẢNH 1: GIÂY THỨ 2 (0–4s)",
+        desc: "Bản đồ VN bên PHẢI (x 1100–1700), đường viền đã vẽ xong, sông Hồng đang chạy từ trên xuống. Chữ 'Văn Lang' 96px trượt vào bên TRÁI. Gợn nước Phú Thọ chuẩn bị nở. Thanh năm: '-2879 TCN'."
+      },
+      {
+        sec: 6,
+        title: "CẢNH 2: GIÂY THỨ 6 (4–8s)",
+        desc: "Xiềng xích vừa vỡ vụn tại 5.8s, các hạt vỡ đang bay theo quán tính và trọng lực nhẹ. Ba ngọn cờ chuẩn bị mọc lên từ y=800 lên y=560. Thanh năm đang chạy nhanh từ 111 TCN đến 938."
+      },
+      {
+        sec: 10,
+        title: "CẢNH 3: GIÂY THỨ 10 (8–12s)",
+        desc: "Chữ 'Bạch Đằng 938' 96px căn giữa trên. Sóng nước 3 tầng cuộn bên dưới. 9 cọc nhọn vút cao. 3 thuyền giặc đang lao tới hàng cọc (chuẩn bị va chạm lúc 10.3s). Thanh năm: '938'."
+      },
+      {
+        sec: 14,
+        title: "CẢNH 4: GIÂY THỨ 14 (12–16s)",
+        desc: "Bản đồ zoom x4 tập trung vào Hà Nội bên TRÁI, vòng cung khiên vàng bảo vệ. 3 mũi tên đỏ lao tới và bật ngược khi va chạm khiên. Chữ 'Thăng Long 1010' 96px bên PHẢI. Thanh năm: ~'1180'."
+      },
+      {
+        sec: 18,
+        title: "CẢNH 5: GIÂY THỨ 18 (16–20s)",
+        desc: "clipPath mở dần từ trên xuống tô vàng bản đồ bên PHẢI. Bên TRÁI: tên 'Lê Lợi 1428' và 'Quang Trung 1789' cùng 2 ngôi sao 4 cánh lấp lánh liên tục. Thanh năm: ~'1590'."
+      },
+      {
+        sec: 22,
+        title: "CẢNH 6: GIÂY THỨ 22 (20–25s) — TOÀN MÀN HÌNH",
+        desc: "Vầng sáng bừng nở từ tâm lan thành nền cờ đỏ #DA251D phủ kín 1920x1080. Ngôi sao vàng 5 cánh #FFCD00 bắt đầu vẽ các cạnh. Thanh năm bật scale nhảy thẳng tới '1945'."
+      },
+      {
+        sec: 27,
+        title: "CẢNH 7: GIÂY THỨ 27 (25–30s)",
+        desc: "Bản đồ hoàn chỉnh ở GIỮA sau khi 2 nửa Bắc - Nam ghép khít. 100 chấm sáng các thành phố đang bật lên dọc dải đất hình chữ S. Thanh năm: '1986' (chuẩn bị zoom out mạng lưới toàn cầu và chữ 'VIỆT NAM')."
+      }
+    ];
+
+    const grid = document.getElementById('grid');
+    const canvases = [];
+
+    snapshotsConfig.forEach((cfg, idx) => {
+      const card = document.createElement('div');
+      card.className = 'snap-card';
+
+      card.innerHTML = `
+        <div class="snap-header">
+          <span class="snap-title">${cfg.title}</span>
+          <span class="snap-meta">Thời điểm: ${cfg.sec}.00s / 30.00s</span>
+        </div>
+        <div class="snap-desc">${cfg.desc}</div>
+        <div class="canvas-box">
+          <canvas id="snapCanvas_${idx}" width="1920" height="1080"></canvas>
+        </div>
+      `;
+
+      grid.appendChild(card);
+      const cv = card.querySelector('canvas');
+      canvases.push({ canvas: cv, sec: cfg.sec, title: cfg.title });
+    });
+
+    // Vẽ từng canvas đúng giây chỉ định
+    function renderAllSnapshots() {
+      canvases.forEach(item => {
+        const ctx = item.canvas.getContext('2d');
+        const W = 1920;
+        const H = 1080;
+        const t = item.sec;
+
+        // Tìm scene tương ứng
+        if (t < 4 && window.HistoryVN_Scene1) {
+          window.HistoryVN_Scene1.render(ctx, t, W, H);
+        } else if (t < 8 && window.HistoryVN_Scene2) {
+          window.HistoryVN_Scene2.render(ctx, t, W, H);
+        } else if (t < 12 && window.HistoryVN_Scene3) {
+          window.HistoryVN_Scene3.render(ctx, t, W, H);
+        } else if (t < 16 && window.HistoryVN_Scene4) {
+          window.HistoryVN_Scene4.render(ctx, t, W, H);
+        } else if (t < 20 && window.HistoryVN_Scene5) {
+          window.HistoryVN_Scene5.render(ctx, t, W, H);
+        } else if (t < 25 && window.HistoryVN_Scene6) {
+          window.HistoryVN_Scene6.render(ctx, t, W, H);
+        } else if (window.HistoryVN_Scene7) {
+          window.HistoryVN_Scene7.render(ctx, t, W, H);
+        }
+
+        // Vẽ thanh năm cố định
+        if (window.PROJECT_HISTORY_VN && window.PROJECT_HISTORY_VN.drawYearBar) {
+          window.PROJECT_HISTORY_VN.drawYearBar(ctx, t, W, H);
+        }
+      });
+    }
+
+    // Tự động vẽ sau khi fonts nạp
+    setTimeout(renderAllSnapshots, 400);
+
+    // Tải về toàn bộ 7 ảnh
+    document.getElementById('btnDownloadAll').onclick = () => {
+      canvases.forEach((item, i) => {
+        setTimeout(() => {
+          const a = document.createElement('a');
+          a.href = item.canvas.toDataURL('image/png');
+          a.download = `Snapshot-Giay-${item.sec.toString().padStart(2, '0')}.png`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        }, i * 250);
+      });
+    };
+  </script>
+</body>
+</html>
+

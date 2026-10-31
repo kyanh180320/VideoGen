@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video AI Studio - Programmatic Video Generator (16:9)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Montserrat:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&display=swap" rel="stylesheet">
+  <!-- Core Studio Styles -->
+  <link rel="stylesheet" href="core/styles.css">
+</head>
+<body>
+
+  <header>
+    <div class="badge">✓ Hệ Thống Module Hóa Đa Dự Án (Mỗi Dự Án 1 Thư Mục Riêng)</div>
+    <h1>LỊCH SỬ NƯỚC MỸ - VIDEO STUDIO 16:9</h1>
+    <p class="subtitle">Đọc xong câu tự chuyển cảnh ngay lập tức • 8 Giọng Tiếng Việt (4 Nam + 4 Nữ) • 4 Nhạc Nền</p>
+    
+    <!-- Bộ chuyển đổi dự án trực tiếp -->
+    <div style="display:flex; justify-content:center; align-items:center; gap:10px; margin-top:14px;">
+      <span style="font-size:12px; color:var(--accent-gold); font-weight:700;">📂 CHỌN DỰ ÁN VIDEO HIỆN TẠI:</span>
+      <select id="selActiveProject" style="width:auto; min-width:280px; font-weight:700; border:1px solid var(--accent-gold); background:#162035; color:#fef08a;">
+        <option value="history_vn" selected>🇻🇳 projects/history_vn (Hào Khí Việt Nam - 30s)</option>
+        <option value="history_us">🇺🇸 projects/history_us (Lịch Sử Nước Mỹ)</option>
+      </select>
+    </div>
+  </header>
+
+  <div class="studio-container">
+    <!-- Video Player Screen (16:9 Aspect Ratio) -->
+    <div class="canvas-wrapper">
+      <canvas id="videoCanvas" width="1920" height="1080"></canvas>
+      
+      <div class="video-overlay-badge">
+        <span class="dot"></span>
+        <span id="activeVoiceBadge">Giọng: Nam Minh Chuẩn</span>
+      </div>
+
+      <div class="video-overlay-time" id="overlayTime">00:00 / 00:38</div>
+
+      <!-- Phụ đề được khắc trực tiếp vào Canvas khi xuất video -->
+      <div class="video-subtitles">
+        <span class="sub-text" id="subtitleText">Nhấn "Phát Video" — Cảnh tự động chuyển ngay khi giọng đọc kết thúc!</span>
+      </div>
+    </div>
+
+    <!-- Controls Bar -->
+    <div class="controls-bar">
+      <!-- Progress scrubber -->
+      <div class="timeline-container">
+        <span class="time-display" id="currentTimeDisp">00:00</span>
+        <div class="progress-bar-wrap" id="progressBar">
+          <div class="progress-fill" id="progressFill"></div>
+          <div class="scene-markers" id="sceneMarkers"></div>
+        </div>
+        <span class="time-display" id="totalTimeDisp" style="text-align:right;">00:38</span>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="buttons-row">
+        <div class="left-buttons">
+          <button class="btn-primary" id="btnPlayPause">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            <span id="playBtnLabel">Phát Video (Có Tiếng Việt)</span>
+          </button>
+          <button class="btn-secondary" id="btnReplay">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+            <span>Phát lại từ đầu</span>
+          </button>
+        </div>
+
+        <div class="right-buttons">
+          <button class="btn-secondary" id="btnSnapshots" style="background:#0f172a; border:1px solid #f59e0b; color:#fef08a;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            <span>Xuất 7 Ảnh Chụp (Giây 2, 6, 10, 14, 18, 22, 27)</span>
+          </button>
+          <button class="btn-export" id="btnExport">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+            <span id="exportBtnLabel">Xuất Video (Tải MP4/WebM)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scene Selector Cards (Tự động sinh theo kịch bản dự án) -->
+    <div class="scene-grid" id="sceneGrid"></div>
+
+    <!-- Audio Studio Settings Panel -->
+    <div class="audio-studio-panel">
+      <div class="panel-header">
+        <span class="panel-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+          Phòng Thu Lồng Tiếng Việt & Âm Nhạc (8 Giọng Nam / Nữ)
+        </span>
+      </div>
+
+      <div class="audio-grid">
+        <!-- Cột 1: Giọng đọc Tiếng Việt -->
+        <div class="config-box">
+          <div class="box-title">
+            <span>🎙️ CHỌN GIỌNG ĐỌC TIẾNG VIỆT (4 NAM + 4 NỮ)</span>
+          </div>
+
+          <div class="voice-chip-grid">
+            <div class="voice-chip active" data-voice="nam_minh">👨 Nam Minh Chuẩn</div>
+            <div class="voice-chip" data-voice="nam_tram">🧔 Nam Trầm Hào Hùng</div>
+            <div class="voice-chip" data-voice="nam_ban_tin">⚡ Nam Bản Tin Nhanh</div>
+            <div class="voice-chip" data-voice="nam_ke_su">📜 Nam Kể Sử Cổ Điển</div>
+            <div class="voice-chip" data-voice="nu_chuan">👩 Hoài My (Nữ Chuẩn)</div>
+            <div class="voice-chip" data-voice="nu_truyen_cam">🌸 Nữ Kể Chuyện Ấm</div>
+            <div class="voice-chip" data-voice="nu_ban_tin">🎙️ Nữ Thời Sự Nhanh</div>
+            <div class="voice-chip" data-voice="nu_cao_sang">✨ Nữ Trẻ Trung Sáng</div>
+          </div>
+
+          <div class="form-group" style="margin-top: 4px;">
+            <select id="selVoicePreset">
+              <option value="nam_minh" selected>Nam Minh Chuẩn (Hào sảng, truyền cảm)</option>
+              <option value="nam_tram">Nam Trầm Hào Hùng (Sử thi, nội lực)</option>
+              <option value="nam_ban_tin">Nam Bản Tin Nhanh (Thời sự dứt khoát)</option>
+              <option value="nam_ke_su">Nam Kể Sử Cổ Điển (Trầm lắng, sâu sắc)</option>
+              <option value="nu_chuan">Hoài My - Nữ Chuẩn (Rõ chữ, tự nhiên)</option>
+              <option value="nu_truyen_cam">Nữ Kể Chuyện Ấm (Ngọt ngào, cảm xúc)</option>
+              <option value="nu_ban_tin">Nữ Thời Sự Nhanh (Trang trọng, linh hoạt)</option>
+              <option value="nu_cao_sang">Nữ Trẻ Trung Sáng (Tươi mới, năng động)</option>
+              <option value="mute">Tắt tiếng lồng tiếng</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label for="rngVoiceRate">Tốc độ đọc (Tempo):</label>
+            <input type="range" id="rngVoiceRate" min="0.75" max="1.6" step="0.05" value="1.00">
+            <span class="range-val" id="valVoiceRate">1.00x</span>
+          </div>
+
+          <div class="form-row" style="background: rgba(16, 185, 129, 0.08); padding: 5px 8px; border-radius: 6px; border: 1px dashed rgba(16, 185, 129, 0.3);">
+            <label for="rngSceneGap" style="color: #34d399; font-weight: 700;">Nghỉ chờ chuyển cảnh (Gap):</label>
+            <input type="range" id="rngSceneGap" min="0.0" max="1.5" step="0.05" value="0.25">
+            <span class="range-val" id="valSceneGap" style="color: #34d399;">0.25s</span>
+          </div>
+
+          <div class="form-row">
+            <label for="rngVoicePitch">Cao độ (Pitch Shift):</label>
+            <input type="range" id="rngVoicePitch" min="-7.0" max="6.0" step="0.2" value="-3.4">
+            <span class="range-val" id="valVoicePitch">-3.4 st</span>
+          </div>
+
+          <div class="form-row">
+            <label for="rngVoiceVol">Âm lượng giọng:</label>
+            <input type="range" id="rngVoiceVol" min="0" max="1.5" step="0.05" value="1.0">
+            <span class="range-val" id="valVoiceVol">100%</span>
+          </div>
+
+          <div style="display:flex; gap:8px; margin-top:2px;">
+            <button class="btn-test" id="btnTestVoice" style="flex:1;">▶ Nghe Thử Giọng Này</button>
+            <button class="btn-test" id="btnStopVoice" style="background:#334155;">Dừng</button>
+          </div>
+        </div>
+
+        <!-- Cột 2: Nhạc Nền -->
+        <div class="config-box">
+          <div class="box-title">
+            <span>🎵 NHẠC NỀN & BỘ TỔNG HỢP ÂM (SYNTHESIZER)</span>
+          </div>
+
+          <div class="form-group">
+            <label for="selMusicStyle">Chọn Thể Loại Nhạc Nền:</label>
+            <select id="selMusicStyle">
+              <option value="zimmer" selected>1. Hùng Tráng Điện Ảnh (Hans Zimmer Style)</option>
+              <option value="patriotic">2. Quân Nhạc & Kèn Chiến Thắng (Fanfare March)</option>
+              <option value="emotional">3. Lắng Đọng Cảm Xúc (Acoustic Piano & Strings)</option>
+              <option value="synthwave">4. Tương Lai & Đổi Mới (Cyber Synthwave)</option>
+              <option value="none">Tắt Nhạc Nền</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="fileCustomMusic">Hoặc Tải Lên File Nhạc Riêng (MP3 / WAV):</label>
+            <input type="file" id="fileCustomMusic" accept="audio/*">
+          </div>
+
+          <div class="form-row">
+            <label for="rngMusicVol">Âm lượng nhạc nền:</label>
+            <input type="range" id="rngMusicVol" min="0" max="1" step="0.02" value="0.28">
+            <span class="range-val" id="valMusicVol">28%</span>
+          </div>
+
+          <div style="margin-top:auto;">
+            <button class="btn-test" id="btnTestMusic" style="width:100%;">♫ Nghe Thử 4 Nhịp Nhạc Nền</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-footer">
+    <div>Trạng thái: <span class="status-msg" id="statusMsg">Sẵn sàng phát video 16:9</span></div>
+    <div>Độ phân giải: <strong>Full HD 1920x1080 (16:9)</strong></div>
+  </div>
+
+  <!-- ========================================================
+       CÁC MODULE ENGINE DÙNG CHUNG (KHÔNG CẦN SỬA KHI ĐỔI DỰ ÁN)
+       ======================================================== -->
+  <!-- Thư viện GSAP Motion & Easing Engine -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+  <!-- Core Graphics & Engine -->
+  <script src="core/graphics.js"></script>
+  <script src="core/engine.js"></script>
+
+  <!-- ========================================================
+       DỮ LIỆU CỦA TỪNG DỰ ÁN RIÊNG BIỆT TRONG THƯ MỤC PROJECTS/
+       ======================================================== -->
+  <!-- Dự án 1: Lịch sử Nước Mỹ (projects/history_us/) -->
+  <script src="projects/history_us/voice_assets.js"></script>
+  <script src="projects/history_us/storyboard.js"></script>
+
+  <!-- Dự án 2: Lịch Sử Việt Nam 30s (projects/history_vn/) -->
+  <script src="projects/history_vn/vietnam_map_data.js"></script>
+  <script src="projects/history_vn/scene1.js"></script>
+  <script src="projects/history_vn/scene2.js"></script>
+  <script src="projects/history_vn/scene3.js"></script>
+  <script src="projects/history_vn/scene4.js"></script>
+  <script src="projects/history_vn/scene5.js"></script>
+  <script src="projects/history_vn/scene6.js"></script>
+  <script src="projects/history_vn/scene7.js"></script>
+  <script src="projects/history_vn/voice_assets.js"></script>
+  <script src="projects/history_vn/storyboard.js"></script>
+
+  <!-- Khởi động & Xử lý chuyển đổi dự án -->
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      // Mặc định nạp dự án Hào Khí Việt Nam (30 giây)
+      VideoEngine.loadProject(window.PROJECT_HISTORY_VN);
+
+      // Xử lý chuyển đổi dự án khi chọn trong menu
+      const selActiveProject = document.getElementById('selActiveProject');
+      if (selActiveProject) {
+        selActiveProject.onchange = () => {
+          VideoEngine.pauseVideo();
+          if (selActiveProject.value === 'history_us') {
+            VideoEngine.loadProject(window.VIDEO_PROJECT);
+          } else {
+            VideoEngine.loadProject(window.PROJECT_HISTORY_VN);
+          }
+        };
+      }
+
+      // Xử lý nút xuất 7 ảnh chụp kiểm tra (Giây 2, 6, 10, 14, 18, 22, 27)
+      const btnSnapshots = document.getElementById('btnSnapshots');
+      if (btnSnapshots) {
+        btnSnapshots.onclick = () => {
+          VideoEngine.pauseVideo();
+          const targetTimes = [2, 6, 10, 14, 18, 22, 27];
+          const canvas = document.getElementById('videoCanvas');
+          const statusMsg = document.getElementById('statusMsg');
+          if (statusMsg) statusMsg.innerHTML = `<span style="color:#f59e0b;">Đang xuất 7 ảnh chụp kiểm tra...</span>`;
+
+          targetTimes.forEach((sec, idx) => {
+            setTimeout(() => {
+              VideoEngine.renderFrame(sec);
+              VideoEngine.updateUI(sec);
+              const dataUrl = canvas.toDataURL('image/png');
+              const a = document.createElement('a');
+              a.href = dataUrl;
+              a.download = `Snapshot-Giay-${sec.toString().padStart(2, '0')}.png`;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+
+              if (idx === targetTimes.length - 1 && statusMsg) {
+                statusMsg.innerHTML = `<span style="color:#10b981;">✓ Đã xuất thành công 7 ảnh chụp tại giây 2, 6, 10, 14, 18, 22, 27!</span>`;
+              }
+            }, idx * 250);
+          });
+        };
+      }
+
+      // Hỗ trợ chế độ chụp ảnh tự động qua tham số URL (?snapshot=X)
+      const urlParams = new URLSearchParams(window.location.search);
+      const snapParam = urlParams.get('snapshot');
+      if (snapParam !== null) {
+        const sec = parseFloat(snapParam);
+        setTimeout(() => {
+          VideoEngine.renderFrame(sec);
+          VideoEngine.updateUI(sec);
+        }, 100);
+      }
+    });
+  </script>
+</body>
+</html>

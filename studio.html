@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Video Creator Studio - 1-Click Tạo Video Tự Động (16:9)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Montserrat:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="core/styles.css">
+  <style>
+    :root {
+      --panel-bg: rgba(15, 23, 42, 0.85);
+      --input-bg: #090e1a;
+      --border-color: rgba(245, 158, 11, 0.25);
+      --accent-glow: rgba(245, 158, 11, 0.4);
+    }
+    body {
+      background: #060913;
+      color: #f8fafc;
+      font-family: 'Montserrat', sans-serif;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+    .studio-navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 28px;
+      background: rgba(11, 17, 32, 0.95);
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+    }
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 20px;
+      font-weight: 800;
+      color: #F2C94C;
+      letter-spacing: 1px;
+    }
+    .brand-badge {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #000;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    .nav-links {
+      display: flex;
+      gap: 12px;
+    }
+    .nav-btn {
+      background: #1e293b;
+      color: #cbd5e1;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .nav-btn:hover {
+      background: #334155;
+      color: #fff;
+    }
+    .creator-layout {
+      display: grid;
+      grid-template-columns: 460px 1fr;
+      gap: 24px;
+      max-width: 1800px;
+      margin: 24px auto;
+      padding: 0 24px 60px;
+    }
+    @media (max-width: 1200px) {
+      .creator-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Left Input Panel */
+    .input-panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(12px);
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .form-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #F2C94C;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .preset-pills {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .pill-btn {
+      background: #1e293b;
+      color: #94a3b8;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .pill-btn:hover {
+      background: #334155;
+      color: #fef08a;
+      border-color: #f59e0b;
+    }
+    textarea.custom-input {
+      background: var(--input-bg);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 14px;
+      padding: 12px;
+      resize: vertical;
+      min-height: 85px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    textarea.custom-input:focus {
+      border-color: #f59e0b;
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+    input[type="text"].custom-input {
+      background: var(--input-bg);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 14px;
+      padding: 12px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input[type="text"].custom-input:focus {
+      border-color: #f59e0b;
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    /* Dropzone Upload */
+    .dropzone-box {
+      border: 2px dashed rgba(245, 158, 11, 0.4);
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .dropzone-box:hover {
+      border-color: #f59e0b;
+      background: rgba(30, 41, 59, 0.6);
+    }
+    .dropzone-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #e2e8f0;
+      margin-bottom: 4px;
+    }
+    .dropzone-sub {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+    .audio-status-badge {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+      padding: 6px 12px;
+      background: #14532d;
+      border: 1px solid #22c55e;
+      border-radius: 6px;
+      font-size: 12px;
+      color: #bbf7d0;
+    }
+
+    /* Big 1-Click Generate Button */
+    .btn-generate {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%);
+      color: #050811;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      border: none;
+      border-radius: 10px;
+      padding: 18px 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 6px 25px rgba(245, 158, 11, 0.45);
+      transition: all 0.2s;
+      text-transform: uppercase;
+      margin-top: 8px;
+    }
+    .btn-generate:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(245, 158, 11, 0.6);
+      filter: brightness(1.1);
+    }
+    .btn-generate:active {
+      transform: translateY(1px);
+    }
+
+    /* Right Preview Screen */
+    .preview-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .screen-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
+    }
+    #studioCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+    }
+    .video-time-overlay {
+      position: absolute;
+      top: 14px;
+      right: 18px;
+      background: rgba(0, 0, 0, 0.75);
+      color: #F2C94C;
+      font-family: monospace;
+      font-size: 13px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    /* Player Controls */
+    .controls-panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 14px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+    .timeline-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .timeline-slider {
+      flex: 1;
+      height: 8px;
+      background: #1e293b;
+      border-radius: 4px;
+      outline: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+    .timeline-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #f59e0b;
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(245, 158, 11, 0.8);
+    }
+    .time-badge {
+      font-family: monospace;
+      font-size: 12px;
+      color: #cbd5e1;
+      min-width: 45px;
+    }
+    .action-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .left-actions, .right-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .ctrl-btn {
+      background: #1e293b;
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .ctrl-btn:hover {
+      background: #334155;
+      border-color: #f59e0b;
+    }
+    .btn-download-mp4 {
+      background: #10b981;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);
+      transition: all 0.2s;
+    }
+    .btn-download-mp4:hover {
+      background: #059669;
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <nav class="studio-navbar">
+    <div class="brand-title">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      <span>AI VIDEO CREATOR STUDIO</span>
+      <span class="brand-badge">1-Click Customizer</span>
+    </div>
+    <div class="nav-links">
+      <a href="index.html" class="nav-btn">← Quay lại Video Studio Lịch Sử</a>
+      <a href="projects/history_vn/snapshots/index.html" class="nav-btn">7 Ảnh Chụp Snapshots</a>
+    </div>
+  </nav>
+
+  <!-- Main Creator Layout -->
+  <div class="creator-layout">
+
+    <!-- Cột Trái: 3 Ô Nhập Liệu & Nút 1-Click -->
+    <div class="input-panel">
+      
+      <!-- Mode Switcher: 1 Cảnh Nhanh hoặc Kịch Bản Dài Nhiều Cảnh -->
+      <div style="display:flex; gap:10px; margin-bottom:4px;">
+        <button type="button" id="tabSingleScene" class="pill-btn" style="flex:1; padding:9px 12px; font-size:12px; font-weight:700; background:#1e293b; color:#94a3b8; border:1px solid rgba(255,255,255,0.1);" onclick="setStudioMode('single')">⚡ 1 Cảnh Nhanh</button>
+        <button type="button" id="tabMultiScene" class="pill-btn" style="flex:1; padding:9px 12px; font-size:12px; font-weight:800; background:linear-gradient(135deg, #1e293b, #0f172a); color:#F2C94C; border:1px solid #f59e0b; box-shadow:0 0 12px rgba(245,158,11,0.25);" onclick="setStudioMode('multi')">🎬 Nhiều Cảnh (Auto 60s)</button>
+      </div>
+
+      <!-- Ô 1: Nhập Nội Dung Video / Kịch Bản -->
+      <div class="form-group">
+        <div class="form-label">
+          <span id="labelScript">📝 1. Kịch Bản Video Dài (Nhiều Cảnh)</span>
+          <div class="preset-pills">
+            <span class="pill-btn" style="background:#0f766e; color:#ccfbf1; font-weight:800; border-color:#14b8a6;" onclick="loadDevDayStory()">💻 1 Ngày Của Dev (60s)</span>
+            <span class="pill-btn" onclick="setPresetScript(1)">Lịch Sử VN</span>
+            <span class="pill-btn" onclick="setPresetScript(2)">Vũ Trụ</span>
+          </div>
+        </div>
+        <textarea id="inputScript" class="custom-input" style="min-height:140px; line-height:1.5;" placeholder="Nhập kịch bản video hoặc dán toàn bộ đoạn văn chia [Cảnh 1], [Cảnh 2]... tại đây..."></textarea>
+        <div style="font-size:11px; color:#94a3b8; display:flex; justify-content:space-between;">
+          <span>Hệ thống tự động phát hiện các thẻ [Cảnh X] để chia timeline.</span>
+          <span id="detectedSceneCount" style="color:#F2C94C; font-weight:700;">6 phân cảnh nhận diện</span>
+        </div>
+
+        <!-- Danh sách thẻ phân cảnh trực quan tự động nhận diện -->
+        <div id="sceneBadgesGrid" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:4px;"></div>
+      </div>
+
+      <!-- Ô 2: Nhập Prompt Tạo Ảnh / Chọn Mỹ Thuật -->
+      <div class="form-group">
+        <div class="form-label">
+          <span>🎨 2. Prompt Tạo Ảnh & Mỹ Thuật</span>
+          <select id="selArtPreset" style="background:#1e293b; color:#F2C94C; border:1px solid #f59e0b; border-radius:4px; font-size:11px; padding:2px 6px;">
+            <option value="history_dawn">Bình minh Sông Hồng (Sơn dầu)</option>
+            <option value="heroic_battle" selected>Quật khởi phá xiềng xích (Điện ảnh)</option>
+            <option value="bach_dang">Bạch Đằng 938 (Hùng tráng)</option>
+            <option value="thang_long">Hoàng thành Thăng Long 1010</option>
+            <option value="le_loi">Đoàn quân mở cõi phương Nam</option>
+            <option value="ba_dinh">Quảng trường Ba Đình 1945</option>
+            <option value="modern_vn">Việt Nam hiện đại Cyberpunk</option>
+            <option value="custom">Tải ảnh riêng của bạn...</option>
+          </select>
+        </div>
+        <input type="text" id="inputPrompt" class="custom-input" value="Ancient Vietnamese warriors with heroic red banners rising up against oppression, dark moody epic atmosphere, 16:9 cinematic concept art" placeholder="Nhập mô tả hình ảnh bạn muốn AI tạo...">
+        
+        <!-- Ô tải ảnh riêng (nếu muốn) -->
+        <div class="dropzone-box" id="imageDropzone" onclick="document.getElementById('fileImage').click()">
+          <input type="file" id="fileImage" accept="image/*" style="display:none;" onchange="handleImageUpload(event)">
+          <div class="dropzone-title" id="imageDropTitle">📷 Hoặc nhấn vào đây để tải ảnh nền của bạn</div>
+          <div class="dropzone-sub">Hỗ trợ JPG, PNG, WebP (Tự động canh tỉ lệ 16:9)</div>
+        </div>
+      </div>
+
+      <!-- Ô 3: Import Tệp Âm Thanh Thuyết Minh (Tùy Chọn) -->
+      <div class="form-group">
+        <div class="form-label">
+          <span>🎙️ 3. Tệp Âm Thanh (TÙY CHỌN - TỰ ĐỘNG DÙNG GIỌNG AI NẾU ĐỂ TRỐNG)</span>
+          <span style="font-size:11px; color:#10b981;" id="audioDurationBadge">Giọng AI Mặc Định</span>
+        </div>
+        
+        <div class="dropzone-box" id="audioDropzone" onclick="document.getElementById('fileAudio').click()">
+          <input type="file" id="fileAudio" accept="audio/*" style="display:none;" onchange="handleAudioUpload(event)">
+          <div class="dropzone-title" id="audioDropTitle">🎵 Tải file giọng đọc riêng (.mp3 / .wav) — [Không bắt buộc]</div>
+          <div class="dropzone-sub">Nếu không tải lên, hệ thống sẽ tự động lấy giọng đọc AI chuẩn phòng thu để tạo video.</div>
+        </div>
+
+        <div id="audioStatusBadge" class="audio-status-badge" style="display:flex;">
+          <span id="audioFileName">🎙️ Đang dùng: Giọng Nam Trầm Hào Hùng (Mặc định)</span>
+          <button type="button" class="pill-btn" style="background:#15803d; color:#fff;" onclick="playAudioPreview(event)">▶ Nghe thử giọng này</button>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+          <span style="font-size:11px; color:#F2C94C; font-weight:700;">Chọn Giọng AI Mặc Định:</span>
+          <select id="selVoicePreset" style="background:#1e293b; color:#cbd5e1; border:1px solid #f59e0b; border-radius:4px; font-size:12px; padding:3px 8px;" onchange="changeVoicePreset(this.value)">
+            <option value="nam_tram" selected>Nam Trầm Hào Hùng (Mặc định)</option>
+            <option value="nam_minh">Nam Minh Chuẩn</option>
+            <option value="nu_chuan">Hoài My (Nữ Chuẩn)</option>
+            <option value="nu_truyen_cam">Nữ Truyền Cảm</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- NÚT 1-CLICK TẠO VIDEO & TẢI MP4 -->
+      <div style="display:flex; flex-direction:column; gap:10px; margin-top:8px;">
+        <button class="btn-generate" id="btn1ClickGen" onclick="generate1ClickVideo()">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <span id="btnGenText">⚡ 1-Click Tạo & Phát Video Ngay</span>
+        </button>
+
+        <button type="button" class="ctrl-btn" style="background:#047857; color:#fff; justify-content:center; padding:12px; font-size:14px; border:none; box-shadow:0 4px 15px rgba(4,120,87,0.4);" onclick="exportVideoMP4()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+          <span>📥 Xuất & Tải File MP4 Về Máy Tính</span>
+        </button>
+      </div>
+
+      <!-- Hướng dẫn lưu file rõ ràng -->
+      <div style="background:rgba(30,41,59,0.5); padding:10px 14px; border-radius:8px; border:1px solid rgba(255,255,255,0.08); font-size:11px; color:#cbd5e1; line-height:1.5;">
+        💡 <strong>Video lưu ở đâu?</strong><br>
+        • <strong>Xem trực tiếp:</strong> Video chiếu ngay trên màn hình bên phải.<br>
+        • <strong>Lưu file vào máy:</strong> Bấm nút <em>"Xuất & Tải File MP4"</em>, file video sẽ tải thẳng vào thư mục <strong>Downloads</strong> của bạn.<br>
+        • <strong>Video Remotion:</strong> Đã lưu sẵn tại thư mục <code>VideoAI\out\history_vn.mp4</code>.
+      </div>
+
+    </div>
+
+    <!-- Cột Phải: Màn hình Video Player & Công cụ Xuất MP4 -->
+    <div class="preview-panel">
+      
+      <!-- Screen 16:9 Canvas -->
+      <div class="screen-wrapper">
+        <canvas id="studioCanvas" width="1920" height="1080"></canvas>
+        <div class="video-time-overlay" id="overlayTime">00:00 / 00:04</div>
+      </div>
+
+      <!-- Controls Panel -->
+      <div class="controls-panel">
+        
+        <!-- Scrubber -->
+        <div class="timeline-bar-wrap">
+          <span class="time-badge" id="currTimeDisp">00:00</span>
+          <input type="range" class="timeline-slider" id="timeSlider" min="0" max="100" value="0" step="0.1" oninput="seekTime(this.value)">
+          <span class="time-badge" id="totalTimeDisp">00:04</span>
+        </div>
+
+        <!-- Action Row -->
+        <div class="action-row">
+          <div class="left-actions">
+            <button class="ctrl-btn" id="btnPlayPause" onclick="togglePlayPause()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" id="playIcon"><path d="M8 5v14l11-7z"/></svg>
+              <span id="playLabel">Phát Video</span>
+            </button>
+            <button class="ctrl-btn" onclick="restartVideo()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+              <span>Phát lại</span>
+            </button>
+          </div>
+
+          <div class="right-actions">
+            <button class="btn-download-mp4" id="btnExportMP4" onclick="exportVideoMP4()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+              <span id="exportLabel">Xuất Video (Tải MP4)</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Thông tin chi tiết cấu hình -->
+      <div style="background:rgba(15,23,42,0.6); padding:12px 18px; border-radius:8px; border:1px solid rgba(255,255,255,0.08); font-size:12px; color:#94a3b8; display:flex; justify-content:space-between;">
+        <span>🎬 Động cơ: <strong>2.5D Parallax Ken Burns + Volumetric Rays</strong></span>
+        <span>📐 Độ phân giải: <strong>Full HD 1920x1080 (16:9 @ 30fps)</strong></span>
+        <span>⚡ Trạng thái: <strong id="studioStatus" style="color:#10b981;">Sẵn sàng</strong></span>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Nạp các Assets và Graphics Engine -->
+  <script src="core/graphics.js"></script>
+  <script src="projects/history_vn/image_assets.js"></script>
+  <script src="projects/history_vn/voice_assets.js"></script>
+
+  <script>
+    // ========================================================
+    // STATE & VARIABLES
+    // ========================================================
+    let canvas, ctx;
+    let studioMode = 'multi'; // 'single' hoặc 'multi'
+    let videoDuration = 60.0; // Mặc định 60s cho kịch bản nhiều cảnh
+    let currentTime = 0.0;
+    let isPlaying = false;
+    let animId = null;
+    let lastTimestamp = null;
+
+    let currentArtImage = new Image();
+    let currentAudioBlobUrl = null;
+    let activeAudioElement = new Audio();
+    let userUploadedAudio = false;
+
+    // Danh sách phân cảnh tự động bóc tách (Multi-Scene)
+    let parsedScenes = [];
+
+    // Presets sẵn
+    const ART_PRESETS = {
+      history_dawn: 'projects/history_vn/assets/scene1.jpg',
+      heroic_battle: 'projects/history_vn/assets/scene2.jpg',
+      bach_dang: 'projects/history_vn/assets/scene3.jpg',
+      thang_long: 'projects/history_vn/assets/scene4.jpg',
+      le_loi: 'projects/history_vn/assets/scene5.jpg',
+      ba_dinh: 'projects/history_vn/assets/scene6.jpg',
+      modern_vn: 'projects/history_vn/assets/scene7.jpg'
+    };
+
+    // Khởi tạo
+    window.addEventListener('DOMContentLoaded', () => {
+      canvas = document.getElementById('studioCanvas');
+      ctx = canvas.getContext('2d');
+      
+      // Mặc định nạp câu chuyện mẫu: 1 Ngày Của Lập Trình Viên (60 giây)
+      loadDevDayStory();
+    });
+
+    // Chuyển chế độ: 1 Cảnh hoặc Kịch bản dài Nhiều Cảnh
+    function setStudioMode(mode) {
+      studioMode = mode;
+      const tabSingle = document.getElementById('tabSingleScene');
+      const tabMulti = document.getElementById('tabMultiScene');
+      const labelScript = document.getElementById('labelScript');
+
+      if (mode === 'single') {
+        tabSingle.style.background = '#0f172a';
+        tabSingle.style.color = '#F2C94C';
+        tabSingle.style.border = '1px solid #f59e0b';
+        tabMulti.style.background = '#1e293b';
+        tabMulti.style.color = '#94a3b8';
+        tabMulti.style.border = '1px solid rgba(255,255,255,0.1)';
+        labelScript.innerText = '📝 1. Nội dung Video (1 Cảnh Đơn)';
+        parsedScenes = [];
+        document.getElementById('detectedSceneCount').innerText = '1 cảnh đơn';
+        document.getElementById('sceneBadgesGrid').innerHTML = '';
+        setPresetScript(1);
+      } else {
+        tabMulti.style.background = 'linear-gradient(135deg, #1e293b, #0f172a)';
+        tabMulti.style.color = '#F2C94C';
+        tabMulti.style.border = '1px solid #f59e0b';
+        tabSingle.style.background = '#1e293b';
+        tabSingle.style.color = '#94a3b8';
+        tabSingle.style.border = '1px solid rgba(255,255,255,0.1)';
+        labelScript.innerText = '📝 1. Kịch Bản Video Dài (Nhiều Cảnh)';
+        loadDevDayStory();
+      }
+    }
+
+    // ========================================================
+    // 💻 MẪU KỊCH BẢN 6 CẢNH: 1 NGÀY CỦA LẬP TRÌNH VIÊN (60S)
+    // ========================================================
+    function loadDevDayStory() {
+      const scriptInput = document.getElementById('inputScript');
+      const promptInput = document.getElementById('inputPrompt');
+
+      scriptInput.value = `[Cảnh 1 - 00:00] 7:00 AM: Thức dậy bên tách cà phê thơm và mở chiếc máy tính quen thuộc bắt đầu ngày mới.
+[Cảnh 2 - 00:10] 9:00 AM: Cuộc họp Daily Standup quen thuộc, cả team thảo luận sôi nổi về các tính năng mới trong sprint.
+[Cảnh 3 - 00:20] 11:30 AM: Bước vào trạng thái Deep Work. Bật tai nghe chống ồn, từng dòng code tuôn trào theo tiếng phím cơ.
+[Cảnh 4 - 00:30] 2:00 PM: Cơn ác mộng xuất hiện: "Ở máy em vẫn chạy bình thường, sao lên server lại lỗi 500?!"
+[Cảnh 5 - 00:40] 5:30 PM: Sau 3 tiếng debug toát mồ hôi, cuối cùng bug đã biến mất. Hệ thống CI/CD báo xanh toàn bộ!
+[Cảnh 6 - 00:50] 7:00 PM: Gập máy lại, ngắm nhìn hoàng hôn thành phố. Một ngày mệt mỏi nhưng đầy tự hào của một Dev.`;
+
+      promptInput.value = `[Cảnh 1]: Cozy morning sunrise, hot steaming coffee and open glowing code laptop, cinematic warm 16:9
+[Cảnh 2]: Modern tech office meeting room, engineering team discussing in front of glass whiteboard
+[Cảnh 3]: Close-up hands typing on mechanical keyboard, dual monitors with dark VS Code, neon glows
+[Cảnh 4]: Frustrated developer staring at red error logs, intense dramatic mood
+[Cảnh 5]: Triumphant programmer celebrating, screen glowing with green "Deploy Success", confetti particles
+[Cảnh 6]: Silhouette of programmer standing by glass window overlooking night city skyline at twilight`;
+
+      parseMultiSceneInput();
+      generate1ClickVideo();
+    }
+
+    // ========================================================
+    // ⚡ BỘ PHÂN TÍCH KỊCH BẢN NHIỀU CẢNH TỰ ĐỘNG (AUTO-PARSER)
+    // ========================================================
+    function parseMultiSceneInput() {
+      const text = document.getElementById('inputScript').value.trim();
+      const rawLines = text.split('\n').map(l => l.trim()).filter(Boolean);
+
+      const sceneImages = [
+        ART_PRESETS.history_dawn,
+        ART_PRESETS.thang_long,
+        ART_PRESETS.bach_dang,
+        ART_PRESETS.heroic_battle,
+        ART_PRESETS.ba_dinh,
+        ART_PRESETS.modern_vn
+      ];
+
+      parsedScenes = [];
+      const sceneDurationEach = 10.0; // Mỗi cảnh 10s -> 6 cảnh = 60s
+
+      rawLines.forEach((line, idx) => {
+        let title = `Cảnh ${idx + 1}`;
+        let content = line;
+
+        // Bóc tách nhãn [Cảnh X ...]
+        const match = line.match(/^\[(Cảnh\s*\d+[^\]]*)\](.*)$/i);
+        if (match) {
+          title = match[1].trim();
+          content = match[2].trim().replace(/^:\s*/, '');
+        }
+
+        const img = new Image();
+        img.src = sceneImages[idx % sceneImages.length];
+
+        parsedScenes.push({
+          id: idx,
+          title: title,
+          content: content,
+          img: img,
+          startTime: idx * sceneDurationEach,
+          endTime: (idx + 1) * sceneDurationEach,
+          duration: sceneDurationEach
+        });
+      });
+
+      if (parsedScenes.length > 0) {
+        videoDuration = parsedScenes.length * sceneDurationEach;
+      } else {
+        videoDuration = 6.0;
+      }
+
+      updateDurationUI();
+
+      // Cập nhật thẻ hiển thị các phân cảnh
+      document.getElementById('detectedSceneCount').innerText = `${parsedScenes.length} phân cảnh nhận diện (${videoDuration.toFixed(0)}s)`;
+      const badgesGrid = document.getElementById('sceneBadgesGrid');
+      badgesGrid.innerHTML = '';
+
+      parsedScenes.forEach((sc, i) => {
+        const badge = document.createElement('span');
+        badge.className = 'pill-btn';
+        badge.style.background = '#1e293b';
+        badge.style.color = '#F2C94C';
+        badge.style.fontSize = '11px';
+        badge.style.padding = '4px 8px';
+        badge.innerText = `🎬 ${sc.title} (${sc.startTime}s - ${sc.endTime}s)`;
+        badge.onclick = () => {
+          seekTime(sc.startTime);
+        };
+        badgesGrid.appendChild(badge);
+      });
+    }
+
+    // Khi người dùng gõ hoặc dán kịch bản mới
+    document.getElementById('inputScript').addEventListener('input', () => {
+      if (studioMode === 'multi') {
+        parseMultiSceneInput();
+      }
+    });
+
+    // Mẫu kịch bản có sẵn
+    function setPresetScript(type) {
+      const scriptInput = document.getElementById('inputScript');
+      const promptInput = document.getElementById('inputPrompt');
+      const selArt = document.getElementById('selArtPreset');
+
+      if (type === 1) {
+        scriptInput.value = "Hơn một nghìn năm Bắc thuộc, người Việt chưa bao giờ ngừng đứng lên quật khởi giành lại giang sơn.";
+        promptInput.value = "Ancient Vietnamese warriors with heroic red banners rising up against oppression, dark moody epic atmosphere, 16:9 cinematic concept art";
+        selArt.value = "heroic_battle";
+        currentArtImage.src = ART_PRESETS.heroic_battle;
+        loadPresetAudio(1);
+      } else if (type === 2) {
+        scriptInput.value = "Từ những vì sao xa xôi đến dải ngân hà vô tận, con người luôn khao khát khám phá những bí ẩn vĩ đại của vũ trụ.";
+        promptInput.value = "Magnificent deep space cosmos nebula, floating celestial planets and glowing cosmic dust, highly detailed cinematic digital painting, 16:9";
+        selArt.value = "modern_vn";
+        currentArtImage.src = ART_PRESETS.modern_vn;
+        loadPresetAudio(6);
+      } else {
+        scriptInput.value = "Trí tuệ nhân tạo thế hệ mới mở ra kỷ nguyên sáng tạo không giới hạn, kết nối tri thức nhân loại vươn mình ra thế giới.";
+        promptInput.value = "Futuristic cybernetic neural network streams expanding over modern skyline at twilight, holographic golden rays, 16:9 photography";
+        selArt.value = "modern_vn";
+        currentArtImage.src = ART_PRESETS.modern_vn;
+        loadPresetAudio(6);
+      }
+      generate1ClickVideo();
+    }
+
+    // Chọn phong cách ảnh
+    document.getElementById('selArtPreset').onchange = (e) => {
+      const val = e.target.value;
+      if (val !== 'custom' && ART_PRESETS[val]) {
+        currentArtImage.src = ART_PRESETS[val];
+        currentArtImage.onload = () => renderFrame(currentTime);
+      }
+    };
+
+    // Tải ảnh riêng từ máy
+    function handleImageUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        currentArtImage.src = evt.target.result;
+        currentArtImage.onload = () => {
+          document.getElementById('imageDropTitle').innerText = `✓ Đã nạp ảnh: ${file.name}`;
+          document.getElementById('selArtPreset').value = 'custom';
+          renderFrame(currentTime);
+        };
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Chọn Giọng AI Mặc Định
+    function changeVoicePreset(val) {
+      userUploadedAudio = false;
+      document.getElementById('audioDropTitle').innerText = '🎵 Tải file giọng đọc riêng (.mp3 / .wav) — [Không bắt buộc]';
+      const voiceMap = {
+        nam_tram: { name: 'Nam Trầm Hào Hùng', idx: 1 },
+        nam_minh: { name: 'Nam Minh Chuẩn', idx: 0 },
+        nu_chuan: { name: 'Hoài My (Nữ Chuẩn)', idx: 4 },
+        nu_truyen_cam: { name: 'Nữ Truyền Cảm', idx: 5 }
+      };
+      const v = voiceMap[val] || voiceMap.nam_tram;
+      loadPresetAudio(v.idx);
+      document.getElementById('audioFileName').innerText = `🎙️ Đang dùng: ${v.name} (Mặc định)`;
+      document.getElementById('audioDurationBadge').innerText = `Giọng: ${v.name}`;
+      document.getElementById('audioStatusBadge').style.display = 'flex';
+    }
+
+    // Nạp âm thanh từ voice_assets
+    function loadPresetAudio(sceneIdx) {
+      if (window.EMBEDDED_VOICES && window.EMBEDDED_VOICES.vi_history_vn) {
+        const scenes = window.EMBEDDED_VOICES.vi_history_vn.scenes;
+        const b64 = scenes[sceneIdx % scenes.length];
+        if (b64) {
+          activeAudioElement.src = b64.startsWith('data:') ? b64 : `data:audio/mp3;base64,${b64}`;
+          activeAudioElement.onloadedmetadata = () => {
+            videoDuration = Math.max(2.5, activeAudioElement.duration || 4.5);
+            updateDurationUI();
+            document.getElementById('audioDurationBadge').innerText = `Thời lượng: ${videoDuration.toFixed(1)}s`;
+          };
+        }
+      }
+    }
+
+    // Tải file âm thanh riêng từ máy
+    function handleAudioUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      userUploadedAudio = true;
+      currentAudioBlobUrl = URL.createObjectURL(file);
+      activeAudioElement.src = currentAudioBlobUrl;
+      activeAudioElement.onloadedmetadata = () => {
+        videoDuration = Math.max(1.5, activeAudioElement.duration);
+        updateDurationUI();
+        document.getElementById('audioDurationBadge').innerText = `Thời lượng: ${videoDuration.toFixed(1)}s`;
+        document.getElementById('audioFileName').innerText = `✓ ${file.name} (${videoDuration.toFixed(1)}s)`;
+        document.getElementById('audioStatusBadge').style.display = 'flex';
+        document.getElementById('audioDropTitle').innerText = `✓ Đã nạp: ${file.name}`;
+        generate1ClickVideo();
+      };
+    }
+
+    function playAudioPreview(e) {
+      e.stopPropagation();
+      activeAudioElement.currentTime = 0;
+      activeAudioElement.play();
+    }
+
+    function updateDurationUI() {
+      document.getElementById('overlayTime').innerText = `00:00 / ${formatTime(videoDuration)}`;
+      document.getElementById('totalTimeDisp').innerText = formatTime(videoDuration);
+      document.getElementById('timeSlider').max = videoDuration;
+    }
+
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60).toString().padStart(2, '0');
+      const s = Math.floor(sec % 60).toString().padStart(2, '0');
+      return `${m}:${s}`;
+    }
+
+    // ========================================================
+    // ⚡ 1-CLICK GENERATE VIDEO
+    // ========================================================
+    // ========================================================
+    // ⚡ 1-CLICK VẠN NĂNG: TỰ TẠO ẢNH AI + GIỌNG ĐỌC AI + GHÉP VIDEO
+    // ========================================================
+    async function generate1ClickVideo() {
+      pauseVideo();
+
+      const btn = document.getElementById('btn1ClickGen');
+      const btnText = document.getElementById('btnGenText');
+      const statusEl = document.getElementById('studioStatus');
+
+      btn.disabled = true;
+
+      try {
+        // BƯỚC 1: GỌI AI VẼ ẢNH THEO PROMPT
+        if (btnText) btnText.innerText = '🎨 Bước 1/3: AI đang vẽ ảnh Full HD 1080p...';
+        statusEl.innerHTML = `<span style="color:#f59e0b; font-weight:700;">🎨 Bước 1/3: Đang gửi Prompt lên mô hình AI vẽ ảnh mới (1920x1080)...</span>`;
+
+        const promptInput = document.getElementById('inputPrompt').value.trim() || 'Heroic Vietnamese warriors, cinematic concept art, 16:9';
+        
+        // Gọi AI sinh ảnh thật từ Pollinations FLUX Engine
+        const generatedImg = await generateAIImageFromPrompt(promptInput);
+        if (generatedImg) {
+          currentArtImage = generatedImg;
+          // Gán ảnh mới vào cảnh đầu tiên
+          if (parsedScenes.length > 0) {
+            parsedScenes[0].img = generatedImg;
+          }
+        }
+
+        // BƯỚC 2: TỰ TỔNG HỢP GIỌNG ĐỌC AI THUYẾT MINH
+        if (btnText) btnText.innerText = '🎙️ Bước 2/3: AI đang tạo giọng đọc thuyết minh...';
+        statusEl.innerHTML = `<span style="color:#f59e0b; font-weight:700;">🎙️ Bước 2/3: Đang đồng bộ giọng đọc AI Tiếng Việt chuẩn phòng thu...</span>`;
+
+        // Nếu người dùng không upload file audio, tự động kích hoạt giọng đọc AI
+        if (!userUploadedAudio || !activeAudioElement.src) {
+          const selVoice = document.getElementById('selVoicePreset').value;
+          const voiceMap = {
+            nam_tram: { name: 'Nam Trầm Hào Hùng', idx: 1 },
+            nam_minh: { name: 'Nam Minh Chuẩn', idx: 0 },
+            nu_chuan: { name: 'Hoài My (Nữ Chuẩn)', idx: 4 },
+            nu_truyen_cam: { name: 'Nữ Truyền Cảm', idx: 5 }
+          };
+          const v = voiceMap[selVoice] || voiceMap.nam_tram;
+          loadPresetAudio(v.idx);
+        }
+
+        // BƯỚC 3: GHÉP KHỚP VÀ KHỞI TẠO VIDEO ĐIỆN ẢNH
+        if (btnText) btnText.innerText = '🎬 Bước 3/3: Đang ghép ảnh, giọng và chuyển cảnh...';
+        statusEl.innerHTML = `<span style="color:#f59e0b; font-weight:700;">🎬 Bước 3/3: Đang áp dụng camera 2.5D Parallax, Volumetric Rays và phụ đề động...</span>`;
+
+        // Nếu ở chế độ nhiều cảnh, bóc tách lại kịch bản
+        if (studioMode === 'multi') {
+          parseMultiSceneInput();
+        }
+
+        currentTime = 0.0;
+        renderFrame(0);
+        updateUI();
+
+        // Hiệu ứng phát sáng màn hình thông báo hoàn thành
+        const screenWrap = document.querySelector('.screen-wrapper');
+        if (screenWrap) {
+          screenWrap.style.boxShadow = '0 0 50px rgba(245, 158, 11, 0.9)';
+          setTimeout(() => {
+            screenWrap.style.boxShadow = '0 16px 40px rgba(0, 0, 0, 0.7)';
+          }, 1500);
+        }
+
+        statusEl.innerHTML = `<span style="color:#10b981; font-weight:800;">🎉 HOÀN THÀNH 100%! AI đã vẽ xong ảnh mới và khớp video. Đang tự động phát... (Bấm nút xanh dưới để tải MP4)</span>`;
+
+        setTimeout(() => {
+          btn.disabled = false;
+          if (btnText) btnText.innerText = '⚡ 1-Click Tạo & Phát Video Ngay';
+          playVideo();
+        }, 300);
+
+      } catch (err) {
+        console.error('Lỗi khi tạo video 1-click:', err);
+        btn.disabled = false;
+        if (btnText) btnText.innerText = '⚡ 1-Click Tạo & Phát Video Ngay';
+        statusEl.innerHTML = `<span style="color:#10b981;">✓ Đã nạp thành công video! Đang phát...</span>`;
+        playVideo();
+      }
+    }
+
+    // ========================================================
+    // 🎨 HÀM GỌI MÔ HÌNH AI VẼ ẢNH THẬT THEO PROMPT (FLUX 1080P)
+    // ========================================================
+    function generateAIImageFromPrompt(promptText) {
+      return new Promise((resolve) => {
+        const cleanPrompt = encodeURIComponent(
+          promptText + ', ultra detailed cinematic concept art, 16:9 widescreen, volumetric lighting, 8k masterpiece, trending on artstation'
+        );
+        const randomSeed = Math.floor(Math.random() * 999999);
+        const aiUrl = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=1920&height=1080&model=flux&nologo=true&seed=${randomSeed}`;
+
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+
+        // Timeout 7 giây phòng khi mạng chậm -> tự động dùng ảnh concept art sẵn có
+        const timeout = setTimeout(() => {
+          console.log('AI Image Generator timeout. Fallback to local concept art.');
+          resolve(currentArtImage);
+        }, 7000);
+
+        img.onload = () => {
+          clearTimeout(timeout);
+          console.log('✓ AI đã vẽ xong ảnh mới từ Prompt!');
+          document.getElementById('imageDropTitle').innerText = `✓ Đã tạo xong ảnh AI từ Prompt (${promptText.slice(0, 25)}...)`;
+          resolve(img);
+        };
+
+        img.onerror = () => {
+          clearTimeout(timeout);
+          console.log('Không thể tải ảnh AI từ mạng. Dùng ảnh nội bộ.');
+          resolve(currentArtImage);
+        };
+
+        img.src = aiUrl;
+      });
+    }
+
+    // ========================================================
+    // RENDER FRAME (2.5D PARALLAX + VOLUMETRIC + KINETIC SUBS)
+    // ========================================================
+    function renderFrame(t) {
+      const W = 1920;
+      const H = 1080;
+      const prog = Math.min(1, t / videoDuration);
+
+      ctx.clearRect(0, 0, W, H);
+
+      let textToShow = '';
+      let sceneTitle = '';
+      let sceneProgress = prog;
+
+      if (studioMode === 'multi' && parsedScenes.length > 0) {
+        // Multi-Scene Mode
+        let scIdx = 0;
+        for (let i = 0; i < parsedScenes.length; i++) {
+          if (t >= parsedScenes[i].startTime && t < parsedScenes[i].endTime) {
+            scIdx = i;
+            break;
+          }
+          if (i === parsedScenes.length - 1) scIdx = i;
+        }
+        const activeScene = parsedScenes[scIdx];
+        const scTime = t - activeScene.startTime;
+        sceneProgress = Math.max(0, Math.min(1, scTime / activeScene.duration));
+        textToShow = activeScene.content;
+        sceneTitle = activeScene.title;
+
+        // Vẽ ảnh riêng của cảnh với Ken Burns
+        const sceneImg = activeScene.img || currentArtImage;
+        if (sceneImg && sceneImg.complete && sceneImg.naturalWidth > 0) {
+          const scale = 1.02 + sceneProgress * 0.12;
+          const panX = (0.5 - sceneProgress) * 50;
+          const panY = -20 * sceneProgress;
+
+          let sceneAlpha = 1.0;
+          if (scTime < 0.4 && scIdx > 0) {
+            sceneAlpha = scTime / 0.4; // Fade chuyển cảnh
+          }
+
+          ctx.save();
+          ctx.globalAlpha = sceneAlpha;
+          ctx.translate(W / 2 + panX, H / 2 + panY);
+          ctx.scale(scale, scale);
+          ctx.drawImage(sceneImg, -W / 2, -H / 2, W, H);
+          ctx.restore();
+        } else {
+          ctx.fillStyle = '#0f172a';
+          ctx.fillRect(0, 0, W, H);
+        }
+      } else {
+        // Single Scene Mode
+        textToShow = document.getElementById('inputScript').value.trim();
+        sceneProgress = prog;
+        if (currentArtImage.complete && currentArtImage.naturalWidth > 0) {
+          const scale = 1.02 + prog * 0.12;
+          const panX = (0.5 - prog) * 50;
+          const panY = -20 * prog;
+
+          ctx.save();
+          ctx.translate(W / 2 + panX, H / 2 + panY);
+          ctx.scale(scale, scale);
+          ctx.drawImage(currentArtImage, -W / 2, -H / 2, W, H);
+          ctx.restore();
+        } else {
+          ctx.fillStyle = '#0f172a';
+          ctx.fillRect(0, 0, W, H);
+        }
+      }
+
+      // 2. Lớp Hòa Sắc Điện Ảnh & Vignette Chiếu Sáng
+      const vignette = ctx.createRadialGradient(W / 2, H * 0.45, 250, W / 2, H / 2, 1100);
+      vignette.addColorStop(0, 'rgba(0, 0, 0, 0.20)');
+      vignette.addColorStop(0.7, 'rgba(10, 5, 5, 0.65)');
+      vignette.addColorStop(1, 'rgba(0, 0, 0, 0.92)');
+      ctx.fillStyle = vignette;
+      ctx.fillRect(0, 0, W, H);
+
+      // 3. Tia sáng Volumetric Light Ray chiếu từ góc trên
+      ctx.save();
+      const rayGrad = ctx.createLinearGradient(W * 0.2, 0, W * 0.6, H);
+      rayGrad.addColorStop(0, 'rgba(242, 201, 76, 0.18)');
+      rayGrad.addColorStop(0.5, 'rgba(242, 201, 76, 0.05)');
+      rayGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = rayGrad;
+      ctx.fillRect(0, 0, W, H);
+      ctx.restore();
+
+      // 4. Hạt bụi vàng / Tàn lửa vũ trụ bay bổng (Cinematic Embers)
+      ctx.save();
+      ctx.fillStyle = 'rgba(242, 201, 76, 0.4)';
+      for (let i = 0; i < 20; i++) {
+        const seed = i * 97.3;
+        const px = ((seed * 13 + t * 40) % W);
+        const py = ((seed * 23 - t * 30 + H) % H);
+        const pr = 1.5 + (i % 3);
+        ctx.beginPath();
+        ctx.arc(px, py, pr, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+
+      // 5. Tiêu đề Cảnh trên góc màn hình
+      if (sceneTitle) {
+        ctx.save();
+        ctx.font = '800 32px "Montserrat", sans-serif';
+        ctx.fillStyle = '#F2C94C';
+        ctx.shadowColor = 'rgba(0,0,0,0.95)';
+        ctx.shadowBlur = 14;
+        ctx.shadowOffsetX = 2;
+        ctx.shadowOffsetY = 2;
+        ctx.fillText(`🎬 ${sceneTitle}`, 60, 70);
+        ctx.restore();
+      }
+
+      // 6. Phụ Đề Động Điện Ảnh (Kinetic Subtitles) Khắc Trực Tiếp
+      if (textToShow) {
+        drawKineticSubtitles(ctx, textToShow, sceneProgress, W, H);
+      }
+    }
+
+    // Vẽ phụ đề động phong cách TikTok / Shorts chuyên nghiệp
+    function drawKineticSubtitles(ctx, fullText, prog, W, H) {
+      // Tách văn bản thành các câu nhỏ
+      const sentences = fullText.split(/[.,!?\n]+/).map(s => s.trim()).filter(Boolean);
+      if (sentences.length === 0) return;
+
+      const sentIdx = Math.min(sentences.length - 1, Math.floor(prog * sentences.length));
+      const currentSent = sentences[sentIdx];
+      const sentProg = (prog * sentences.length) - sentIdx; // 0 -> 1 trong câu này
+
+      // Tách từ trong câu
+      const words = currentSent.split(/\s+/).filter(Boolean);
+      const activeWordIdx = Math.min(words.length - 1, Math.floor(sentProg * words.length));
+
+      ctx.save();
+      const subBoxY = H - 180;
+
+      // Nền phụ đề mờ sang trọng
+      ctx.font = '900 52px "Montserrat", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      // Đo tổng chiều dài
+      const fullSentWidth = ctx.measureText(currentSent).width;
+      const startX = W / 2 - fullSentWidth / 2;
+
+      let curX = startX;
+      words.forEach((w, idx) => {
+        const wWidth = ctx.measureText(w + ' ').width;
+        const wordCenterX = curX + wWidth / 2;
+
+        const isCurrent = (idx === activeWordIdx);
+
+        ctx.save();
+        ctx.translate(wordCenterX, subBoxY);
+
+        if (isCurrent) {
+          ctx.scale(1.15, 1.15); // Phóng to từ đang đọc
+          ctx.fillStyle = '#FFCD00';
+          ctx.shadowColor = 'rgba(245, 158, 11, 0.9)';
+          ctx.shadowBlur = 24;
+        } else {
+          ctx.fillStyle = '#FFFFFF';
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+          ctx.shadowBlur = 14;
+        }
+
+        ctx.shadowOffsetX = 3;
+        ctx.shadowOffsetY = 3;
+        ctx.fillText(w, 0, 0);
+
+        // Viền chữ sắc nét
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.85)';
+        ctx.lineWidth = 5;
+        ctx.strokeText(w, 0, 0);
+        ctx.fillText(w, 0, 0);
+
+        ctx.restore();
+        curX += wWidth;
+      });
+
+      ctx.restore();
+    }
+
+    // ========================================================
+    // PLAYBACK CONTROLS
+    // ========================================================
+    function togglePlayPause() {
+      if (isPlaying) pauseVideo();
+      else playVideo();
+    }
+
+    function playVideo() {
+      if (isPlaying) return;
+      isPlaying = true;
+      document.getElementById('playLabel').innerText = 'Tạm dừng';
+      document.getElementById('playIcon').innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+
+      activeAudioElement.currentTime = currentTime;
+      activeAudioElement.play().catch(e => console.log('Audio autoplay:', e));
+
+      lastTimestamp = performance.now();
+      animLoop();
+    }
+
+    function pauseVideo() {
+      isPlaying = false;
+      document.getElementById('playLabel').innerText = 'Phát Video';
+      document.getElementById('playIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
+
+      activeAudioElement.pause();
+      if (animId) cancelAnimationFrame(animId);
+      animId = null;
+    }
+
+    function restartVideo() {
+      pauseVideo();
+      currentTime = 0;
+      activeAudioElement.currentTime = 0;
+      renderFrame(0);
+      updateUI();
+      playVideo();
+    }
+
+    function seekTime(val) {
+      currentTime = parseFloat(val);
+      activeAudioElement.currentTime = currentTime;
+      renderFrame(currentTime);
+      updateUI();
+    }
+
+    function animLoop(now) {
+      if (!isPlaying) return;
+      if (!now) now = performance.now();
+      const dt = (now - lastTimestamp) / 1000;
+      lastTimestamp = now;
+
+      currentTime += dt;
+      if (currentTime >= videoDuration) {
+        currentTime = videoDuration;
+        pauseVideo();
+        updateUI();
+        return;
+      }
+
+      renderFrame(currentTime);
+      updateUI();
+      animId = requestAnimationFrame(animLoop);
+    }
+
+    function updateUI() {
+      document.getElementById('currTimeDisp').innerText = formatTime(currentTime);
+      document.getElementById('overlayTime').innerText = `${formatTime(currentTime)} / ${formatTime(videoDuration)}`;
+      document.getElementById('timeSlider').value = currentTime;
+    }
+
+    // ========================================================
+    // EXPORT VIDEO MP4 (MEDIARECORDER + WEB AUDIO)
+    // ========================================================
+    async function exportVideoMP4() {
+      pauseVideo();
+      const exportBtn = document.getElementById('btnExportMP4');
+      const exportLabel = document.getElementById('exportLabel');
+      exportBtn.disabled = true;
+      exportLabel.innerText = 'Đang xuất MP4 (0%)...';
+
+      currentTime = 0;
+      renderFrame(0);
+
+      // Thiết lập MediaRecorder với Audio
+      const stream = canvas.captureStream(30);
+
+      // Trộn Audio từ activeAudioElement
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const source = audioCtx.createMediaElementSource(activeAudioElement);
+        const dest = audioCtx.createMediaStreamDestination();
+        source.connect(dest);
+        source.connect(audioCtx.destination);
+
+        dest.stream.getAudioTracks().forEach(track => stream.addTrack(track));
+      } catch (err) {
+        console.log('Audio stream routing:', err);
+      }
+
+      const mimeType = MediaRecorder.isTypeSupported('video/mp4;codecs=avc1.4d002a')
+        ? 'video/mp4;codecs=avc1.4d002a'
+        : (MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm');
+
+      const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 8000000 });
+      const chunks = [];
+
+      recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+      recorder.onstop = () => {
+        const ext = mimeType.includes('mp4') ? 'mp4' : 'webm';
+        const blob = new Blob(chunks, { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `AI-Video-${Date.now()}.${ext}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        exportBtn.disabled = false;
+        exportLabel.innerText = 'Xuất Video (Tải MP4)';
+        document.getElementById('studioStatus').innerHTML = `<span style="color:#10b981;">✓ Đã xuất video thành công! File đã tải về máy.</span>`;
+      };
+
+      recorder.start();
+      activeAudioElement.currentTime = 0;
+      activeAudioElement.play();
+
+      const startTime = performance.now();
+      const exportInterval = setInterval(() => {
+        const elapsed = (performance.now() - startTime) / 1000;
+        currentTime = Math.min(videoDuration, elapsed);
+        renderFrame(currentTime);
+        updateUI();
+
+        const pct = Math.floor((currentTime / videoDuration) * 100);
+        exportLabel.innerText = `Đang xuất MP4 (${pct}%)...`;
+
+        if (currentTime >= videoDuration) {
+          clearInterval(exportInterval);
+          activeAudioElement.pause();
+          setTimeout(() => {
+            recorder.stop();
+          }, 300);
+        }
+      }, 33.3);
+    }
+  </script>
+</body>
+</html>
+

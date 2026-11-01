@@ -1,11 +1,21 @@
 /**
  * ========================================================
  * CẢNH 2 (4–8s): XIỀNG XÍCH VỠ TAN & BA NGỌN CỜ QUẬT KHỞI
+ * Tích hợp Nghệ Thuật Điện Ảnh (Cinematic Art) & 2.5D Parallax Camera
  * ========================================================
  */
 window.HistoryVN_Scene2 = (function() {
   const startTime = 4;
   const duration = 4;
+
+  let bgImg = null;
+  function getBgImage() {
+    if (!bgImg && window.VN_IMAGE_ASSETS && window.VN_IMAGE_ASSETS.scene2) {
+      bgImg = new Image();
+      bgImg.src = window.VN_IMAGE_ASSETS.scene2;
+    }
+    return bgImg;
+  }
 
   // Khởi tạo các hạt vỡ sẵn để tái hiện chuẩn xác
   const linkCount = 12;
@@ -30,20 +40,50 @@ window.HistoryVN_Scene2 = (function() {
     }
   }
 
+  // 3 ngọn cờ
+  const flagConfigs = [
+    { x: 600, startT: 2.3 },  // 6.3s (t = 2.3)
+    { x: 960, startT: 2.6 },  // 6.6s (t = 2.6)
+    { x: 1320, startT: 2.9 }  // 6.9s (t = 2.9)
+  ];
+
   function render(ctx, globalTime, W, H) {
     if (globalTime < startTime || globalTime > startTime + duration) return;
     const t = globalTime - startTime; // 0 to 4s (tương ứng 4-8s tuyệt đối)
 
-    // Fade out 7.7-8s
+    // Fade in 0-0.3s, Fade out 7.7-8s
     let alpha = 1;
-    if (t > 3.7) alpha = Math.max(0, (4.0 - t) / 0.3);
+    if (t < 0.3) alpha = t / 0.3;
+    else if (t > 3.7) alpha = Math.max(0, (4.0 - t) / 0.3);
 
     ctx.save();
     ctx.globalAlpha = alpha;
 
-    // Nền cố định #8B1A1A
-    ctx.fillStyle = '#8B1A1A';
-    ctx.fillRect(0, 0, W, H);
+    // 1. NGHỆ THUẬT ĐIỆN ẢNH VỚI 2.5D KEN BURNS PUSH-IN
+    const img = getBgImage();
+    const prog = t / duration;
+
+    if (img && img.complete && img.naturalWidth > 0) {
+      const scale = 1.02 + prog * 0.10; // Phóng tới mạnh mẽ 1.02 -> 1.12
+      const panY = -15 * prog;
+
+      ctx.save();
+      ctx.translate(W / 2, H / 2 + panY);
+      ctx.scale(scale, scale);
+      ctx.drawImage(img, -W / 2, -H / 2, W, H);
+      ctx.restore();
+
+      // Ánh sáng bão tố và lửa quật khởi
+      const grad = ctx.createRadialGradient(W / 2, chainY, 200, W / 2, H / 2, 1000);
+      grad.addColorStop(0, 'rgba(139, 26, 26, 0.35)');
+      grad.addColorStop(0.7, 'rgba(110, 15, 15, 0.70)');
+      grad.addColorStop(1, 'rgba(20, 2, 2, 0.92)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+    } else {
+      ctx.fillStyle = '#8B1A1A';
+      ctx.fillRect(0, 0, W, H);
+    }
 
     // 4–5s (t: 0-1s): 12 mắt xích oval hiện lần lượt từ trái sang phải, cách nhau 0.07s
     // 5–5.8s (t: 1-1.8s): Cả chuỗi rung ngang ±4px tốc độ tăng dần
@@ -58,8 +98,10 @@ window.HistoryVN_Scene2 = (function() {
 
       ctx.save();
       ctx.translate(shakeX, 0);
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+      ctx.shadowBlur = 15;
       ctx.strokeStyle = '#F2C94C';
-      ctx.lineWidth = 4;
+      ctx.lineWidth = 4.5;
 
       for (let i = 0; i < linkCount; i++) {
         const appearT = i * 0.07;
@@ -86,57 +128,60 @@ window.HistoryVN_Scene2 = (function() {
       if (shatterT < 1.2) {
         const pAlpha = Math.max(0, 1 - shatterT / 1.2);
         ctx.save();
-        ctx.fillStyle = '#F2C94C';
+        ctx.shadowColor = '#F2C94C';
+        ctx.shadowBlur = 10;
+        ctx.fillStyle = '#FFE066';
         particles.forEach(p => {
           const px = p.origX + p.vx * (shatterT * 25);
           const py = p.origY + p.vy * (shatterT * 25) + 0.5 * p.gravity * Math.pow(shatterT * 25, 2);
           ctx.globalAlpha = alpha * pAlpha;
           ctx.beginPath();
-          ctx.arc(px, py, 4, 0, Math.PI * 2);
+          ctx.arc(px, py, 4.5, 0, Math.PI * 2);
           ctx.fill();
         });
         ctx.restore();
       }
     }
 
-    // 6.3s, 6.6s, 6.9s (t: 2.3s, 2.6s, 2.9s): Lần lượt mọc 3 ngọn cờ tại x=600, 960, 1320
-    // Cột vươn từ y=800 lên y=560, mỗi cờ mất 0.5s
-    const flagConfigs = [
-      { startT: 2.3, x: 600 },
-      { startT: 2.6, x: 960 },
-      { startT: 2.9, x: 1320 }
-    ];
-
-    flagConfigs.forEach((cfg, idx) => {
-      if (t >= cfg.startT) {
-        const flagProg = Math.min(1, (t - cfg.startT) / 0.5);
+    // 6.3s, 6.6s, 6.9s: Ba ngọn cờ mọc lên từ y=800 lên y=560, mất 0.5s mỗi cờ
+    flagConfigs.forEach((flag) => {
+      if (t >= flag.startT) {
+        const flagProg = Math.min(1, (t - flag.startT) / 0.5);
         const curTopY = 800 - flagProg * (800 - 560);
+        const waveTime = t * 6;
 
         ctx.save();
-        ctx.strokeStyle = '#F2C94C';
-        ctx.lineWidth = 5;
+        ctx.shadowColor = 'rgba(0,0,0,0.85)';
+        ctx.shadowBlur = 14;
 
         // Cột cờ
+        ctx.strokeStyle = '#F2C94C';
+        ctx.lineWidth = 4;
         ctx.beginPath();
-        ctx.moveTo(cfg.x, 800);
-        ctx.lineTo(cfg.x, curTopY);
+        ctx.moveTo(flag.x, 800);
+        ctx.lineTo(flag.x, curTopY);
         ctx.stroke();
 
-        // Lá cờ tam giác phấp phới sóng sin khi cột đã vươn lên
-        if (flagProg > 0.4) {
-          const cAlpha = (flagProg - 0.4) / 0.6;
-          ctx.globalAlpha = alpha * cAlpha;
-          ctx.fillStyle = '#F2C94C';
-          ctx.beginPath();
-          ctx.moveTo(cfg.x, curTopY);
+        // Lá cờ tam giác phấp phới sóng sin
+        if (flagProg > 0.3) {
+          const flagScale = (flagProg - 0.3) / 0.7;
+          const flagW = 110 * flagScale;
+          const flagH = 70 * flagScale;
 
-          // Đường lượn sóng của lá cờ tam giác
-          const flagW = 120;
-          const waveTipY = curTopY + 35 + Math.sin(globalTime * 8 + idx) * 12;
-          ctx.lineTo(cfg.x + flagW, waveTipY);
-          ctx.lineTo(cfg.x, curTopY + 70);
+          const waveOffset1 = Math.sin(waveTime) * 8;
+          const waveOffset2 = Math.cos(waveTime * 1.2) * 10;
+
+          ctx.fillStyle = '#DA251D';
+          ctx.strokeStyle = '#F2C94C';
+          ctx.lineWidth = 2.5;
+
+          ctx.beginPath();
+          ctx.moveTo(flag.x, curTopY);
+          ctx.lineTo(flag.x + flagW + waveOffset1, curTopY + flagH / 2 + waveOffset2);
+          ctx.lineTo(flag.x, curTopY + flagH);
           ctx.closePath();
           ctx.fill();
+          ctx.stroke();
         }
         ctx.restore();
       }
@@ -145,23 +190,21 @@ window.HistoryVN_Scene2 = (function() {
     ctx.restore();
   }
 
+  // 4–8s: Thanh năm chạy nhanh từ "111 TCN" đến "938" (ease power2.in)
   function getYearText(globalTime) {
-    // 4–8s: chạy nhanh từ "111 TCN" đến "938" theo ease power2.in
-    const t = Math.max(0, Math.min(1, (globalTime - 4) / 4));
-    const easeProg = Math.pow(t, 2); // power2.in
+    const t = Math.max(0, Math.min(4, globalTime - startTime));
+    const prog = t / 4;
+    const easeProg = Math.pow(prog, 2);
 
-    if (t < 0.3) {
-      return "111 TCN";
-    }
+    const yearVal = -111 + easeProg * (938 - (-111));
+    const roundYear = Math.round(yearVal);
 
-    // Từ năm -111 đến +938
-    const yearVal = Math.floor(-111 + easeProg * (938 - (-111)));
-    if (yearVal < 0) {
-      return `${Math.abs(yearVal)} TCN`;
+    if (roundYear < 0) {
+      return `${Math.abs(roundYear)} TCN`;
+    } else {
+      return `${roundYear}`;
     }
-    return `${yearVal}`;
   }
 
   return { startTime, duration, render, getYearText };
 })();
-

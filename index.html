@@ -1,29 +1,39 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Video AI Studio - Programmatic Video Generator (16:9)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Montserrat:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Montserrat:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&display=swap"
+    rel="stylesheet">
   <!-- Core Studio Styles -->
   <link rel="stylesheet" href="core/styles.css">
 </head>
+
 <body>
 
   <header>
     <div class="badge">✓ Hệ Thống Module Hóa Đa Dự Án (Mỗi Dự Án 1 Thư Mục Riêng)</div>
     <h1>LỊCH SỬ NƯỚC MỸ - VIDEO STUDIO 16:9</h1>
     <p class="subtitle">Đọc xong câu tự chuyển cảnh ngay lập tức • 8 Giọng Tiếng Việt (4 Nam + 4 Nữ) • 4 Nhạc Nền</p>
-    
-    <!-- Bộ chuyển đổi dự án trực tiếp -->
-    <div style="display:flex; justify-content:center; align-items:center; gap:10px; margin-top:14px;">
+
+    <!-- Bộ chuyển đổi dự án trực tiếp & Phím tắt vào AI Studio -->
+    <div style="display:flex; justify-content:center; align-items:center; gap:12px; margin-top:14px; flex-wrap:wrap;">
       <span style="font-size:12px; color:var(--accent-gold); font-weight:700;">📂 CHỌN DỰ ÁN VIDEO HIỆN TẠI:</span>
-      <select id="selActiveProject" style="width:auto; min-width:280px; font-weight:700; border:1px solid var(--accent-gold); background:#162035; color:#fef08a;">
+      <select id="selActiveProject"
+        style="width:auto; min-width:280px; font-weight:700; border:1px solid var(--accent-gold); background:#162035; color:#fef08a;">
+        <option value="1_day_life_dev">💻 projects/1_day_life_dev (1 Ngày Của Dev - 60s)</option>
         <option value="history_vn" selected>🇻🇳 projects/history_vn (Hào Khí Việt Nam - 30s)</option>
         <option value="history_us">🇺🇸 projects/history_us (Lịch Sử Nước Mỹ)</option>
       </select>
+      <a href="studio.html"
+        style="background:linear-gradient(135deg, #f59e0b, #d97706); color:#000; text-decoration:none; padding:6px 14px; border-radius:6px; font-size:12px; font-weight:800; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 10px rgba(245,158,11,0.4);">
+        ⚡ Mở AI Studio (1-Click Tạo Video Tự Động) →
+      </a>
     </div>
   </header>
 
@@ -31,7 +41,7 @@
     <!-- Video Player Screen (16:9 Aspect Ratio) -->
     <div class="canvas-wrapper">
       <canvas id="videoCanvas" width="1920" height="1080"></canvas>
-      
+
       <div class="video-overlay-badge">
         <span class="dot"></span>
         <span id="activeVoiceBadge">Giọng: Nam Minh Chuẩn</span>
@@ -41,7 +51,8 @@
 
       <!-- Phụ đề được khắc trực tiếp vào Canvas khi xuất video -->
       <div class="video-subtitles">
-        <span class="sub-text" id="subtitleText">Nhấn "Phát Video" — Cảnh tự động chuyển ngay khi giọng đọc kết thúc!</span>
+        <span class="sub-text" id="subtitleText">Nhấn "Phát Video" — Cảnh tự động chuyển ngay khi giọng đọc kết
+          thúc!</span>
       </div>
     </div>
 
@@ -61,22 +72,33 @@
       <div class="buttons-row">
         <div class="left-buttons">
           <button class="btn-primary" id="btnPlayPause">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7z" />
+            </svg>
             <span id="playBtnLabel">Phát Video (Có Tiếng Việt)</span>
           </button>
           <button class="btn-secondary" id="btnReplay">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z" />
+            </svg>
             <span>Phát lại từ đầu</span>
           </button>
         </div>
 
         <div class="right-buttons">
-          <button class="btn-secondary" id="btnSnapshots" style="background:#0f172a; border:1px solid #f59e0b; color:#fef08a;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <button class="btn-secondary" id="btnSnapshots"
+            style="background:#0f172a; border:1px solid #f59e0b; color:#fef08a;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+              <circle cx="12" cy="13" r="4" />
+            </svg>
             <span>Xuất 7 Ảnh Chụp (Giây 2, 6, 10, 14, 18, 22, 27)</span>
           </button>
           <button class="btn-export" id="btnExport">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+            </svg>
             <span id="exportBtnLabel">Xuất Video (Tải MP4/WebM)</span>
           </button>
         </div>
@@ -90,7 +112,12 @@
     <div class="audio-studio-panel">
       <div class="panel-header">
         <span class="panel-title">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+            <line x1="12" y1="19" x2="12" y2="23" />
+            <line x1="8" y1="23" x2="16" y2="23" />
+          </svg>
           Phòng Thu Lồng Tiếng Việt & Âm Nhạc (8 Giọng Nam / Nữ)
         </span>
       </div>
@@ -133,7 +160,8 @@
             <span class="range-val" id="valVoiceRate">1.00x</span>
           </div>
 
-          <div class="form-row" style="background: rgba(16, 185, 129, 0.08); padding: 5px 8px; border-radius: 6px; border: 1px dashed rgba(16, 185, 129, 0.3);">
+          <div class="form-row"
+            style="background: rgba(16, 185, 129, 0.08); padding: 5px 8px; border-radius: 6px; border: 1px dashed rgba(16, 185, 129, 0.3);">
             <label for="rngSceneGap" style="color: #34d399; font-weight: 700;">Nghỉ chờ chuyển cảnh (Gap):</label>
             <input type="range" id="rngSceneGap" min="0.0" max="1.5" step="0.05" value="0.25">
             <span class="range-val" id="valSceneGap" style="color: #34d399;">0.25s</span>
@@ -216,6 +244,7 @@
   <script src="projects/history_us/storyboard.js"></script>
 
   <!-- Dự án 2: Lịch Sử Việt Nam 30s (projects/history_vn/) -->
+  <script src="projects/history_vn/image_assets.js"></script>
   <script src="projects/history_vn/vietnam_map_data.js"></script>
   <script src="projects/history_vn/scene1.js"></script>
   <script src="projects/history_vn/scene2.js"></script>
@@ -289,4 +318,5 @@
     });
   </script>
 </body>
+
 </html>

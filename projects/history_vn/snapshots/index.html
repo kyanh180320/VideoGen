@@ -87,6 +87,7 @@
   <div class="snapshots-grid" id="grid"></div>
 
   <!-- Nạp các module kịch bản -->
+  <script src="../image_assets.js"></script>
   <script src="../vietnam_map_data.js"></script>
   <script src="../scene1.js"></script>
   <script src="../scene2.js"></script>
@@ -191,8 +192,10 @@
       });
     }
 
-    // Tự động vẽ sau khi fonts nạp
-    setTimeout(renderAllSnapshots, 400);
+    // Tự động vẽ sau khi fonts & ảnh nạp
+    setTimeout(renderAllSnapshots, 200);
+    setTimeout(renderAllSnapshots, 600);
+    setTimeout(renderAllSnapshots, 1200);
 
     // Tải về toàn bộ 7 ảnh
     document.getElementById('btnDownloadAll').onclick = () => {

@@ -1,18 +1,27 @@
 /**
  * ========================================================
  * CẢNH 7 (25–30s): THỐNG NHẤT NON SÔNG, MẠNG LƯỚI TOÀN CẦU & VIỆT NAM
+ * Tích hợp Nghệ Thuật Điện Ảnh (Cinematic Art) & 2.5D Parallax Camera
  * ========================================================
  */
 window.HistoryVN_Scene7 = (function() {
   const startTime = 25;
   const duration = 5;
 
+  let bgImg = null;
+  function getBgImage() {
+    if (!bgImg && window.VN_IMAGE_ASSETS && window.VN_IMAGE_ASSETS.scene7) {
+      bgImg = new Image();
+      bgImg.src = window.VN_IMAGE_ASSETS.scene7;
+    }
+    return bgImg;
+  }
+
   // Bản đồ ở GIỮA: x: 700–1220 (width 520px), y: 96–900 (height 800px)
-  // Scale chuẩn: 520 / 600 = ~0.866
   const mapCenterBoxX = 660;
   const mapCenterBoxY = 96;
 
-  // Khởi tạo mạng lưới các chấm toàn cầu ngẫu nhiên (30 chấm)
+  // Khởi tạo mạng lưới các chấm toàn cầu ngẫu nhiên (36 chấm)
   const globalNetworkDots = [];
   for (let g = 0; g < 36; g++) {
     globalNetworkDots.push({
@@ -44,9 +53,31 @@ window.HistoryVN_Scene7 = (function() {
     // KHÔNG FADE OUT Ở CUỐI CẢNH 7
     ctx.save();
 
-    // Nền cố định #8B1A1A
-    ctx.fillStyle = '#8B1A1A';
-    ctx.fillRect(0, 0, W, H);
+    // 1. NGHỆ THUẬT ĐIỆN ẢNH VIỆT NAM HIỆN ĐẠI 2.5D PARALLAX
+    const img = getBgImage();
+    const prog = t / duration;
+
+    if (img && img.complete && img.naturalWidth > 0) {
+      const scale = 1.0 + prog * 0.08;
+      const panY = -15 * prog;
+
+      ctx.save();
+      ctx.translate(W / 2, H / 2 + panY);
+      ctx.scale(scale, scale);
+      ctx.drawImage(img, -W / 2, -H / 2, W, H);
+      ctx.restore();
+
+      // Hòa sắc điện ảnh chuyển mình rực rỡ
+      const grad = ctx.createRadialGradient(W / 2, H * 0.45, 300, W / 2, H / 2, 1100);
+      grad.addColorStop(0, 'rgba(139, 26, 26, 0.40)');
+      grad.addColorStop(0.7, 'rgba(110, 15, 15, 0.72)');
+      grad.addColorStop(1, 'rgba(25, 4, 4, 0.92)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+    } else {
+      ctx.fillStyle = '#8B1A1A';
+      ctx.fillRect(0, 0, W, H);
+    }
 
     // 28–29.3s (t: 3.0-4.3s): Zoom out, bản đồ thu nhỏ (scale 1→0.3)
     let zoomScale = 1.0;
@@ -72,9 +103,11 @@ window.HistoryVN_Scene7 = (function() {
       // Nửa Bắc
       ctx.save();
       ctx.translate(mapCenterBoxX + northOffsetX, mapCenterBoxY);
+      ctx.shadowColor = 'rgba(0,0,0,0.85)';
+      ctx.shadowBlur = 14;
       ctx.strokeStyle = '#F2C94C';
       ctx.lineWidth = 3.5;
-      ctx.fillStyle = 'rgba(242, 201, 76, 0.12)';
+      ctx.fillStyle = 'rgba(242, 201, 76, 0.15)';
 
       const nPts = window.VN_MAP_DATA.mainlandPoints.filter(p => p[1] <= 412);
       ctx.beginPath();
@@ -90,9 +123,11 @@ window.HistoryVN_Scene7 = (function() {
       // Nửa Nam
       ctx.save();
       ctx.translate(mapCenterBoxX + southOffsetX, mapCenterBoxY);
+      ctx.shadowColor = 'rgba(0,0,0,0.85)';
+      ctx.shadowBlur = 14;
       ctx.strokeStyle = '#F2C94C';
       ctx.lineWidth = 3.5;
-      ctx.fillStyle = 'rgba(242, 201, 76, 0.12)';
+      ctx.fillStyle = 'rgba(242, 201, 76, 0.15)';
 
       const sPts = window.VN_MAP_DATA.mainlandPoints.filter(p => p[1] >= 408);
       ctx.beginPath();
@@ -105,66 +140,50 @@ window.HistoryVN_Scene7 = (function() {
       ctx.fill();
       ctx.restore();
 
-      // 25.8–26.5s: Một đường sáng chạy dọc vết ghép vĩ tuyến 17 (y = 410)
-      if (t >= 0.8 && t <= 1.5) {
-        const seamP = (t - 0.8) / 0.7;
-        const seamX = mapCenterBoxX + 245 + seamP * (315 - 245);
-        const seamY = mapCenterBoxY + 410;
-
-        ctx.save();
-        ctx.strokeStyle = '#FFFFFF';
-        ctx.lineWidth = 5;
-        ctx.beginPath();
-        ctx.moveTo(mapCenterBoxX + 245, seamY);
-        ctx.lineTo(seamX, seamY);
-        ctx.stroke();
-
-        ctx.fillStyle = '#FFFFFF';
-        ctx.beginPath();
-        ctx.arc(seamX, seamY, 8, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      }
-
-      // 26–27.5s (t: 1.0-2.5s): ~100 chấm sáng bật lên lần lượt từ Bắc xuống Nam cách nhau 0.015s
-      // Hiệu ứng pop scale 0→1.5→1
+      // 26–28s (t: 1.0-3.0s): 100 chấm sáng bật lên dọc theo dải đất hình chữ S
       if (t >= 1.0) {
+        const dotProg = Math.min(1, (t - 1.0) / 2.0);
         const cityDots = window.VN_MAP_DATA.cityDots;
+        const visibleCount = Math.floor(dotProg * cityDots.length);
+
         ctx.save();
         ctx.translate(mapCenterBoxX, mapCenterBoxY);
+        ctx.shadowColor = '#F2C94C';
+        ctx.shadowBlur = 12;
 
-        cityDots.forEach((dot, idx) => {
-          const popStartTime = 1.0 + idx * 0.015;
-          if (t >= popStartTime) {
-            const dotAge = (t - popStartTime) / 0.2; // 0.2s duration
-            let dotScale = 1.0;
-            if (dotAge < 0.5) {
-              dotScale = (dotAge / 0.5) * 1.5; // 0 -> 1.5
-            } else if (dotAge < 1.0) {
-              dotScale = 1.5 - ((dotAge - 0.5) / 0.5) * 0.5; // 1.5 -> 1.0
-            }
+        for (let c = 0; c < visibleCount; c++) {
+          const pt = cityDots[c];
+          ctx.fillStyle = '#FFE066';
+          ctx.beginPath();
+          ctx.arc(pt[0], pt[1], 4, 0, Math.PI * 2);
+          ctx.fill();
 
-            ctx.fillStyle = '#F2C94C';
+          // Lớp halo mờ quanh các thành phố lớn
+          if (c % 10 === 0) {
+            ctx.fillStyle = 'rgba(242, 201, 76, 0.35)';
             ctx.beginPath();
-            ctx.arc(dot.x, dot.y, 3.5 * dotScale, 0, Math.PI * 2);
+            ctx.arc(pt[0], pt[1], 10, 0, Math.PI * 2);
             ctx.fill();
           }
-        });
+        }
         ctx.restore();
       }
     }
-    ctx.restore(); // Kết thúc scale zoom out của bản đồ
 
-    // 28–29.3s (t >= 3.0s): Thêm các chấm ngẫu nhiên khắp khung hình,
-    // mỗi chấm nối với 3 chấm gần nhất bằng đường mảnh, tạo mạng lưới toàn cầu
+    ctx.restore(); // Khôi phục scale của map zoom
+
+    // 28–30s (t: 3.0-5.0s): Mạng lưới chấm sáng toàn màn hình + Chữ "VIỆT NAM"
     if (t >= 3.0) {
-      const netProg = Math.min(1, (t - 3.0) / 1.3);
+      const netProg = Math.min(1, (t - 3.0) / 1.0);
+
       ctx.save();
       ctx.globalAlpha = netProg;
+      ctx.shadowColor = '#F2C94C';
+      ctx.shadowBlur = 16;
 
-      // Các đường nối mảnh
-      ctx.strokeStyle = 'rgba(242, 201, 76, 0.25)';
-      ctx.lineWidth = 1;
+      // Đường nối mạng lưới
+      ctx.strokeStyle = 'rgba(242, 201, 76, 0.35)';
+      ctx.lineWidth = 1.5;
       networkLines.forEach(line => {
         ctx.beginPath();
         ctx.moveTo(line[0].x, line[0].y);
@@ -172,48 +191,63 @@ window.HistoryVN_Scene7 = (function() {
         ctx.stroke();
       });
 
-      // Các chấm sáng toàn cầu
-      ctx.fillStyle = '#F2C94C';
-      globalNetworkDots.forEach(d => {
+      // Các chấm nút mạng
+      globalNetworkDots.forEach(dot => {
+        ctx.fillStyle = '#FFE066';
         ctx.beginPath();
-        ctx.arc(d.x, d.y, 3, 0, Math.PI * 2);
+        ctx.arc(dot.x, dot.y, 4, 0, Math.PI * 2);
         ctx.fill();
       });
+
       ctx.restore();
     }
 
-    // 29–30s (t >= 4.0s): Chữ "VIỆT NAM" cỡ 160px hiện dần ở giữa, GIỮ NGUYÊN đến hết (không fade out)
-    if (t >= 4.0) {
-      const textProg = Math.min(1, (t - 4.0) / 0.8);
+    // 28.5–30s (t: 3.5-5.0s): Chữ "VIỆT NAM" lớn ở giữa cuối cảnh
+    if (t >= 3.5) {
+      const textProg = Math.min(1, (t - 3.5) / 0.8);
+      const textScale = 0.85 + textProg * 0.15; // 0.85 -> 1.0
+
       ctx.save();
       ctx.globalAlpha = textProg;
+      ctx.translate(W / 2, H / 2);
+      ctx.scale(textScale, textScale);
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.98)';
+      ctx.shadowBlur = 35;
+      ctx.shadowOffsetY = 6;
+
       ctx.fillStyle = '#F2C94C';
-      ctx.font = '900 160px "Playfair Display", "Be Vietnam Pro", serif';
+      ctx.font = '900 120px "Playfair Display", "Be Vietnam Pro", serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
-      ctx.shadowBlur = 20;
-      ctx.fillText("VIỆT NAM", 960, 520);
+      ctx.fillText("VIỆT NAM", 0, 0);
+
+      // Phụ đề kiêu hãnh bên dưới
+      ctx.font = '600 32px "Montserrat", sans-serif';
+      ctx.fillStyle = '#FFFFFF';
+      ctx.shadowBlur = 16;
+      ctx.fillText("ĐỘC LẬP • TỰ CƯỜNG • VƯƠN MÌNH RA THẾ GIỚI", 0, 90);
+
       ctx.restore();
     }
 
     ctx.restore();
   }
 
+  // 25–30s: Thanh năm đếm 1975 → 1986 → 2026
   function getYearText(globalTime) {
-    // "1975" (25s) → "1986" (26.5s) → chạy nhanh đến "2026" (28–29s)
-    if (globalTime < 26.5) {
-      return "1975";
+    const t = Math.max(0, Math.min(5, globalTime - startTime));
+    if (t < 2.0) {
+      // 25-27s: 1975 -> 1986
+      const p1 = t / 2.0;
+      const y1 = 1975 + p1 * (1986 - 1975);
+      return `${Math.round(y1)}`;
+    } else {
+      // 27-30s: 1986 -> 2026
+      const p2 = (t - 2.0) / 3.0;
+      const y2 = 1986 + p2 * (2026 - 1986);
+      return `${Math.round(y2)}`;
     }
-    if (globalTime < 28.0) {
-      return "1986";
-    }
-    // Chạy từ 1986 đến 2026 trong 28-29s
-    const p = Math.min(1, (globalTime - 28.0) / 1.0);
-    const yr = Math.floor(1986 + p * (2026 - 1986));
-    return `${yr}`;
   }
 
   return { startTime, duration, render, getYearText };
 })();
-

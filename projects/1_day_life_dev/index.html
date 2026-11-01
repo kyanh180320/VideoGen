@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1 Ngày Cuộc Sống Của Lập Trình Viên (60s) - Video Studio 16:9</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Montserrat:wght@400;500;600;700;800;900&family=Fira+Code:wght@500;700&display=swap"
+    rel="stylesheet">
+  <!-- Core Studio Styles -->
+  <link rel="stylesheet" href="../../core/styles.css">
+  <style>
+    .dev-badge-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .dev-card {
+      background: #162035;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .dev-card:hover {
+      border-color: #f59e0b;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2);
+    }
+
+    .dev-card.active {
+      border-color: #f59e0b;
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+    }
+
+    .dev-thumb {
+      width: 72px;
+      height: 48px;
+      border-radius: 4px;
+      object-fit: cover;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="badge">🎬 DỰ ÁN VIDEO 60 GIÂY • 6 PHÂN CẢNH ĐIỆN ẢNH (1920x1080)</div>
+    <h1>1 NGÀY CUỘC SỐNG CỦA LẬP TRÌNH VIÊN</h1>
+    <p class="subtitle">Khởi đầu cà phê sáng • Daily standup • Deep work • Bug 500 • Deploy thành công • Hoàng hôn thành
+      phố</p>
+
+    <div style="display:flex; justify-content:center; align-items:center; gap:12px; margin-top:14px; flex-wrap:wrap;">
+      <a href="../../studio.html"
+        style="background:linear-gradient(135deg, #f59e0b, #d97706); color:#000; text-decoration:none; padding:7px 16px; border-radius:6px; font-size:13px; font-weight:800; display:inline-flex; align-items:center; gap:6px;">
+        ⚡ Mở AI Video Studio (1-Click Tự Động)
+      </a>
+      <a href="../../index.html"
+        style="background:#1e293b; color:#cbd5e1; text-decoration:none; padding:7px 16px; border-radius:6px; font-size:13px; font-weight:600; border:1px solid rgba(255,255,255,0.1);">
+        ← Quay lại Video Studio Lịch Sử VN
+      </a>
+    </div>
+  </header>
+
+  <div class="studio-container">
+    <!-- Video Player Screen (16:9 Aspect Ratio) -->
+    <div class="canvas-wrapper">
+      <canvas id="videoCanvas" width="1920" height="1080"></canvas>
+
+      <div class="video-overlay-badge">
+        <span class="dot"></span>
+        <span id="activeVoiceBadge">Giọng: Nam Minh Chuẩn</span>
+      </div>
+
+      <div class="video-overlay-time" id="overlayTime">00:00 / 01:00</div>
+
+      <div class="video-subtitles">
+        <span class="sub-text" id="subtitleText">Nhấn "Phát Video" để xem trọn vẹn 6 phân cảnh cuộc sống lập trình viên
+          60 giây!</span>
+      </div>
+    </div>
+
+    <!-- Controls Bar -->
+    <div class="controls-bar">
+      <div class="timeline-container">
+        <span class="time-display" id="currentTimeDisp">00:00</span>
+        <div class="progress-bar-wrap" id="progressBar">
+          <div class="progress-fill" id="progressFill"></div>
+          <div class="scene-markers" id="sceneMarkers"></div>
+        </div>
+        <span class="time-display" id="totalTimeDisp" style="text-align:right;">01:00</span>
+      </div>
+
+      <div class="buttons-row">
+        <div class="left-buttons">
+          <button id="btnPlay" class="btn-primary">▶ Phát Video</button>
+          <button id="btnPause" class="btn-secondary" style="display:none;">⏸ Tạm Dừng</button>
+          <button id="btnReplay" class="btn-secondary">↺ Phát Lại</button>
+
+          <div class="select-group">
+            <label for="selVoice">Giọng Đọc:</label>
+            <select id="selVoice">
+              <option value="nam_minh" selected>Nam Minh Chuẩn (Mặc định)</option>
+              <option value="nam_tram">Nam Trầm Hào Hùng</option>
+              <option value="nam_ban_tin">Nam Bản Tin Nhanh</option>
+              <option value="nu_chuan">Hoài My (Nữ Chuẩn)</option>
+              <option value="nu_truyen_cam">Nữ Kể Chuyện Ấm</option>
+              <option value="mute">Tắt Giọng (Chỉ Nhạc Nền)</option>
+            </select>
+          </div>
+
+          <div class="select-group">
+            <label for="selMusic">Nhạc Nền:</label>
+            <select id="selMusic">
+              <option value="synthwave" selected>Cyber Synthwave (Coding)</option>
+              <option value="zimmer">Hans Zimmer Epic</option>
+              <option value="emotional">Cảm Xúc Lắng Đọng</option>
+              <option value="none">Tắt Nhạc Nền</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="right-buttons">
+          <button id="btnExport" class="btn-success">
+            ⬇ Xuất Video (Tải MP4 1080p)
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Danh sách 6 phân cảnh -->
+    <h3 style="margin-top:24px; color:#F2C94C; font-size:16px; font-weight:700;">🎬 DANH SÁCH 6 PHÂN CẢNH TRONG VIDEO
+      (Bấm để nhảy đến cảnh):</h3>
+    <div class="dev-badge-grid" id="sceneCardsGrid">
+      <div class="dev-card" onclick="VideoEngine.seekToTime(0)">
+        <img class="dev-thumb" src="assets/scene1.jpg" alt="Scene 1">
+        <div>
+          <div style="color:#F2C94C; font-weight:700; font-size:13px;">1. 07:00 AM • Cà Phê Sáng</div>
+          <div style="color:#94a3b8; font-size:11px;">Mở máy quen thuộc bắt đầu ngày mới</div>
+        </div>
+      </div>
+      <div class="dev-card" onclick="VideoEngine.seekToTime(10)">
+        <img class="dev-thumb" src="assets/scene2.jpg" alt="Scene 2">
+        <div>
+          <div style="color:#F2C94C; font-weight:700; font-size:13px;">2. 09:00 AM • Daily Standup</div>
+          <div style="color:#94a3b8; font-size:11px;">Họp thảo luận tính năng mới cùng team</div>
+        </div>
+      </div>
+      <div class="dev-card" onclick="VideoEngine.seekToTime(20)">
+        <img class="dev-thumb" src="assets/scene3.jpg" alt="Scene 3">
+        <div>
+          <div style="color:#F2C94C; font-weight:700; font-size:13px;">3. 11:30 AM • Deep Work</div>
+          <div style="color:#94a3b8; font-size:11px;">Tai nghe chống ồn, code tuôn trào</div>
+        </div>
+      </div>
+      <div class="dev-card" onclick="VideoEngine.seekToTime(30)">
+        <img class="dev-thumb" src="assets/scene4.jpg" alt="Scene 4">
+        <div>
+          <div style="color:#ef4444; font-weight:700; font-size:13px;">4. 02:00 PM • Ác Mộng Bug 500</div>
+          <div style="color:#94a3b8; font-size:11px;">Ở máy em chạy bình thường mà...</div>
+        </div>
+      </div>
+      <div class="dev-card" onclick="VideoEngine.seekToTime(40)">
+        <img class="dev-thumb" src="assets/scene5.jpg" alt="Scene 5">
+        <div>
+          <div style="color:#10b981; font-weight:700; font-size:13px;">5. 05:30 PM • Deploy Thành Công</div>
+          <div style="color:#94a3b8; font-size:11px;">CI/CD báo xanh toàn bộ sau 3h debug</div>
+        </div>
+      </div>
+      <div class="dev-card" onclick="VideoEngine.seekToTime(50)">
+        <img class="dev-thumb" src="assets/scene6.jpg" alt="Scene 6">
+        <div>
+          <div style="color:#F2C94C; font-weight:700; font-size:13px;">6. 07:00 PM • Hoàng Hôn Tự Hào</div>
+          <div style="color:#94a3b8; font-size:11px;">Gập máy lại, ngắm hoàng hôn thành phố</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer
+    style="margin-top:40px; padding:20px; text-align:center; color:#64748b; font-size:12px; border-top:1px solid rgba(255,255,255,0.06);">
+    <div>Trạng thái: <span class="status-msg" id="statusMsg">Sẵn sàng phát video 60 giây Full HD 1080p</span></div>
+    <div>Độ phân giải: <strong>Full HD 1920x1080 (16:9) • 6 Phân cảnh • Đồ họa 2.5D Parallax</strong></div>
+  </footer>
+
+  <!-- Core Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="../../core/graphics.js"></script>
+  <script src="../../core/engine.js"></script>
+
+  <!-- Project Assets -->
+  <script src="image_assets.js"></script>
+  <script src="../history_vn/voice_assets.js"></script>
+  <script src="storyboard.js"></script>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      // Nạp dự án 1 Ngày Của Lập Trình Viên (60s)
+      VideoEngine.loadProject(window.PROJECT_1_DAY_LIFE_DEV);
+    });
+  </script>
+</body>
+
+</html>

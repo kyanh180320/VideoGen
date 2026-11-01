@@ -1,13 +1,24 @@
 {
   "name": "videoai",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Programmatic AI Video Studio powered by Remotion and GSAP",
+  "main": "src/index.jsx",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "remotion studio src/index.jsx",
+    "render": "remotion render src/index.jsx HistoryVN out/history_vn.mp4",
+    "still": "remotion still src/index.jsx HistoryVN out/snapshot.png",
+    "compositions": "remotion compositions src/index.jsx"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs"
+  "type": "module",
+  "dependencies": {
+    "@remotion/cli": "^4.0.539",
+    "@remotion/media": "4.0.539",
+    "@remotion/media-utils": "^4.0.539",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "remotion": "^4.0.539"
+  }
 }

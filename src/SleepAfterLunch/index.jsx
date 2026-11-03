@@ -10,6 +10,7 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from 'remotion';
+import { Scene2Animated } from './Scene2Animated';
 
 const SLEEP_SCENES = [
   {
@@ -167,12 +168,16 @@ export const SleepAfterLunchVideo = () => {
             durationInFrames={durationInFrames}
             name={`${scene.id}. [${scene.startSec.toFixed(1)}s - ${scene.endSec.toFixed(1)}s]`}
           >
-            <DoodleSceneCard
-              imageSrc={scene.imageSrc}
-              zoomDir={scene.zoomDir}
-              isFirst={index === 0}
-              isLast={index === SLEEP_SCENES.length - 1}
-            />
+            {scene.id === 2 ? (
+              <Scene2Animated />
+            ) : (
+              <DoodleSceneCard
+                imageSrc={scene.imageSrc}
+                zoomDir={scene.zoomDir}
+                isFirst={index === 0}
+                isLast={index === SLEEP_SCENES.length - 1}
+              />
+            )}
           </Sequence>
         );
       })}
